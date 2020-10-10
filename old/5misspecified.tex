@@ -1,0 +1,55 @@
+\section{With Dependencies: Where Labeled Data Helps}
+\label{sec:misspecification}
+
+In practice, labeling functions are not always conditionally independent given the gold label. As we discuss in Section \ref{sec:setting_dp}, dependencies are typically ignored and even when dependencies are modeled subsets of conditionally independent labeling functions are needed. Recognizing that the performance of the model assuming conditional independence is important even when some dependencies exist, we assess the value of labeled data in this setting. In Section \ref{sec:dependency_example} we construct an example with dependencies for which labeled data helps, and in Section \ref{sec:dependency_example_labels} show that the number of labeled data points required for significant performance gains is small.
+
+\subsection{A example with dependencies where unlabeled data is not enough}
+\label{sec:dependency_example}
+
+We construct an example with reasonable labeling function behavior where data programming cannot aggregate labeling function accuracies better than a simple majority vote, while learning from labeled data under the same invalid assumptions of conditional independence can perform much better asymptotically. Consider a data distribution $\mathcal{D}$ and $m$ labeling functions $\lambda_1,\hdots,\lambda_m$ (with $m$ divisible by two for simplicity) which follow the following rules.
+\begin{itemize}
+    \item Each $\lambda_j$ is unipolar, always either abstaining or outputting $c_j\in\{-1,1\}$.
+    
+    \item The class of the $j$'th labeling function is
+    \[c_j=\begin{cases}
+        1&\text{ if }\lfloor j/2\rfloor\text{ mod }2=1\\
+        -1&\text{ otherwise}
+    \end{cases}\]
+    such that $c_1=-1$, $c_2=1$, $c_3=1$, $c_4=-1$, $c_5=-1$ and classes continue alternating every two indices.
+    
+    \item Each $\lambda_j$ outputs $c_j\in\{-1,1\}$ with probability $\beta'$ and abstains otherwise, independently of other labeling functions.
+    
+    \item The true label for each point is the majority vote of the labeling functions. In the case of ties, the gold label is that of the largest index labeling function that fired. The gold labels where every labeling function abstains are set such that classes are equally balanced.
+\end{itemize}
+Notice that while labeling functions fire independently of each other, they are not conditionally independent given the gold label. By the symmetry in the behavior of the labeling functions, any data programming approach with access to only unlabeled data cannot be correct for more than half of the points where ties occur. In other words, learning anything about labeling function behavior from only unlabeled data is hopeless and using the majority vote of labeling functions for noisy labels is optimal. With access to labels, even assuming conditional independence, we can do better because labeled data provides empirical estimates of accuracies. For $m=4$ labeling functions and $\beta'=1/4$ let $\boldsymbol{X}=\{x^i\}_{i=1}^n$, $\boldsymbol{Y}=\{y^i\}_{i=1}^n$ with $(x^i,y^i)$ sampled i.i.d. from $\sim\mathcal{D}$. Then as $n\to\infty$ (which we simulate by making $n$ large enough that each set of labeling function outputs occurs exactly proportionally to its probability) we have
+\begin{center}
+    \begin{TAB}(r,.5cm,.6cm)[2pt]{|c|c|c|c|c|c|}{|c|c|c|}% (rows,min,max)[tabcolsep]{columns}{rows}
+        Objective & $\hat{\alpha}_1$ & $\hat{\alpha}_2$ & $\hat{\alpha}_3$ & $\hat{\alpha}_4$ & $A(\boldsymbol{Y},\hat{\boldsymbol{Y}})$ \\
+        $\ell_\text{unlabeled}(\boldsymbol{X},\lambda,\alpha,\beta)$ & .5692 & .5692 & .5692 & .5692 & .7695 \\
+        $\ell_\text{labeled}(\boldsymbol{X},\boldsymbol{Y},\lambda,\alpha,\beta)$ & .6719 & .7969 & .7969 & .9531 & .8320 \\
+    \end{TAB}
+\end{center}
+% \begin{center}
+%  \begin{tabular}{|c||c|c|c|c|c|} 
+%  \hline
+%  & $\hat{\alpha}_1$ & $\hat{\alpha}_2$ & $\hat{\alpha}_3$ & $\hat{\alpha}_4$ & $A(\boldsymbol{Y},\hat{\boldsymbol{Y}})$ \\
+%  \hline\hline
+%  $\hat{\alpha},\hat{\beta}=\argmax_{\alpha,\beta}\ell_\text{unlabeled}(\boldsymbol{X},\lambda,\alpha,\beta)$ & .5692 & .5692 & .5692 & .5692 & .7695 \\
+%  \hline
+%  $\hat{\alpha},\hat{\beta}=\argmax_{\alpha,\beta}\ell_\text{labeled}(\boldsymbol{X},\boldsymbol{Y},\lambda,\alpha,\beta)$ & .6719 & .7969 & .7969 & .9531 & .8320 \\
+%  \hline
+% \end{tabular}
+% \end{center}
+As expected, we estimate the same accuracy for every labeling function with only unlabeled data and estimate accuracies increasing with priority with access to labels. With more realistic parameters of $m=10$ labeling functions and $\beta'=1/5$ we observe an even larger gap in performance, with unlabeled data yielding noisy labels with accuracy $.8401$ and labeled data yielding noisy labels with accuracy $.9453$. \bcw{Looking for feedback about this in particular:} As a reminder, we use the same mis-specified model to learn accuracies and produce noisy labels from unlabeled and labeled data. The large performance gap between unlabeled and labeled data reflects that there is something to learn from labels that cannot be learned without labels, and also that labels provide robustness to a mis-specified model.
+
+\subsection{Even a small number of labeled data points can help}
+\label{sec:dependency_example_labels}
+
+For our example with dependencies with $m=10$ and $\beta'=1/5$, we know that learning from labeled data achieves better asymptotic performance than learning from unlabeled data. We now provide empirical results that the number of gold labels needed to observe this increase is relatively small. With $m=10$ and $\beta'=1/5$, we sample $10,000$ points from $\mathcal{D}$ and train a model on $n_L$ labeled points and $n_U=10,000-n_L$ unlabeled points with the labeled points selected randomly from the $10,000$ points. We report the average accuracy for different budgets of labeled points and different values of the parameter $\gamma$, averaged over $100$ trials in \autoref{fig:misspecified_budgets}. We see for instance that having $70$ labels results in a $4.5$ point performance gain over having no labels.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.5\textwidth]{figures/misspecification_accuracies_plot.pdf}
+    \caption{We plot accuracy of a model trained on $10,000$ points from our mis-specified data distribution with $m=10$ and $\beta'=1/5$ of which $n_L$ are labeled, averaged over $100$ trials. Even small numbers of labeled data points can significantly improve performance.}
+    \label{fig:misspecified_budgets}
+\end{figure}

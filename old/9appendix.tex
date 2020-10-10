@@ -1,0 +1,155 @@
+\section{Maximum likelihood estimation without conditional abstain probabilities has a degenerate solution when every labeling function is unipolar}
+\label{appendix:degenerate_solution}
+
+We show that the maximum likelihood estimate for $\alpha$ under the probability model proposed by \cite{Ratner16} is degenerate when every labeling function is unipolar. This model considers the probability that labeling functions abstain equally across different classes, stating that the probability of observing labeling function outputs $z$ with gold label $y$ is
+\begin{equation*}
+    \text{Pr}_{\alpha,\beta}[\lambda_j(X)=z\mid Y=y]=\begin{cases}
+        \alpha_j\beta_j&\text{ if }z=y\\
+        (1-\alpha_j)\beta_j&\text{ if }z=-y\\
+        (1-\beta_j)&\text{ if }z=0
+    \end{cases}
+\end{equation*}
+Under this model we can write the log-likelihood as
+\begin{align*}
+    \ell_\text{unlabeled}(\boldsymbol{X}_U,\lambda,\alpha,\beta)&=\log\prod_{i=1}^{n_U}\text{Pr}_{\alpha,\beta}[\lambda(X)=\lambda(x^i_U)]\\
+    &=\sum_{i=1}^{n_U}\log\sum_{y'\in\{-1,1\}}\text{Pr}_{\alpha,\beta}[\lambda(X)=\lambda(x^i_U), Y=y']\\
+    &=\sum_{i=1}^{n_U}\log\sum_{y'\in\{-1,1\}}\text{Pr}[Y=y']\cdot\prod_{j=1}^m\text{Pr}_{\alpha,\beta}[\lambda_j(X)=\lambda_j(x^i_U)\mid Y=y']\\
+    &=\sum_{i=1}^{n_U}\log\sum_{y'\in\{-1,1\}}\text{Pr}[Y=y']\cdot\prod_{j=1}^m\begin{cases}
+        \alpha_j\beta_j&\text{ if }\lambda_j(x^i_U)=y'\\
+        (1-\alpha_j)\beta_j&\text{ if }\lambda_j(x^i_U)=-y'\\
+        (1-\beta_j)&\text{ if }\lambda_j(x^i_U)=0
+    \end{cases}\\
+    &=\sum_{i=1}^{n_U}\log\sum_{y'\in\{-1,1\}}\text{Pr}[Y=y']\cdot\prod_{j=1}^m\begin{cases}
+        \beta_j&\text{ if }\lvert\lambda_j(x^i_U)\rvert=1\\
+        1-\beta_j&\text{ if }\lambda_j(x^i_U)=0
+    \end{cases}\\
+    &\qquad\cdot\begin{cases}
+        \alpha_j&\text{ if }\lambda_j(x^i_U)=y'\\
+        1-\alpha_j&\text{ if }\lambda_j(x^i_U)=-y'\\
+        1&\text{ if }\lambda_j(x^i_U)=0
+    \end{cases}\\
+    &=\sum_{i=1}^{n_U}\log\prod_{j=1}^m\begin{cases}
+        \beta_j&\text{ if }\lvert\lambda_j(x^i_U)\rvert=1\\
+        1-\beta_j&\text{ if }\lambda_j(x^i_U)=0
+    \end{cases}\\
+    &\qquad+\log\sum_{y'\in\{-1,1\}}\text{Pr}[Y=y']\cdot\prod_{j=1}^m\begin{cases}
+        \alpha_j&\text{ if }\lambda_j(x^i_U)=y'\\
+        1-\alpha_j&\text{ if }\lambda_j(x^i_U)=-y'\\
+        1&\text{ if }\lambda_j(x^i_U)=0
+    \end{cases}\\
+    &=\ell_\text{coverages}(\boldsymbol{X}_U,\lambda,\beta)+\ell_\text{accuracies}(\boldsymbol{X}_U,\lambda,\alpha)
+\end{align*}
+where
+\begin{equation*}
+    \ell_\text{coverages}(\boldsymbol{X}_U,\lambda,\beta)=\sum_{i=1}^{n_U}\sum_{j=1}^m\log\begin{cases}
+        \beta_j&\text{ if }\lvert\lambda_j(x^i_U)\rvert=1\\
+        1-\beta_j&\text{ if }\lambda_j(x^i_U)=0
+    \end{cases}
+\end{equation*}
+and
+\begin{equation*}
+    \ell_\text{accuracies}(\boldsymbol{X}_U,\lambda,\alpha)=\sum_{i=1}^{n_U}\log\sum_{y'\in\{-1,1\}}\text{Pr}[Y=y']\cdot\prod_{j=1}^m\begin{cases}
+        \alpha_j&\text{ if }\lambda_j(x^i_U)=y'\\
+        1-\alpha_j&\text{ if }\lambda_j(x^i_U)=-y'\\
+        1&\text{ if }\lambda_j(x^i_U)=0
+    \end{cases}
+\end{equation*}
+Hence the maximum likelihood estimates of $\alpha$ and $\beta$ are those which maximize $\ell_\text{accuracies}$ and $\ell_\text{coverages}$, respectively. The expression for $\ell_\text{coverages}$ is just the sum of the log-likelihood functions for $m$ Bernoulli random variables, meaning that the optimal value for each $\beta_j$ is the empirical coverage of $\lambda_j$ on the training set. Now, let $y_m$ be the majority class.
+\begin{equation*}
+    y_m=\argmax_y\text{Pr}[Y=y]
+\end{equation*}
+and let $\alpha^*$ be the estimate which assigns accuracy $1$ to every labeling function which outputs class $y_m$ and accuracy $0$ to every labeling function which outputs class $1-y_m$.
+\begin{equation*}
+    \alpha^*_j=\begin{cases}
+        1&\text{ if }\text{class}(\lambda_j)=y_m\\
+        0&\text{ otherwise}
+    \end{cases}
+\end{equation*}
+We will show that $\alpha^*$ maximizes $\ell_\text{accuracies}$ and is thus the degenerate solution to this maximum likelihood estimation model. For each $x^i_U$, we consider two cases. If at least one labeling function fires, then let $j_\text{fires}$ denote the index of the labeling function which fires. Then
+\begin{align*}
+    &\sum_{y'\in\{-1,1\}}\text{Pr}[Y=y']\cdot\prod_{j=1}^m\begin{cases}
+        \alpha_j&\text{ if }\lambda_j(x^i_U)=y'\\
+        1-\alpha_j&\text{ if }\lambda_j(x^i_U)=-y'\\
+        1&\text{ if }\lambda_j(x^i_U)=0
+    \end{cases}\\
+    \leq&\sum_{y'\in\{-1,1\}}\text{Pr}[Y=y']\cdot\begin{cases}
+        \alpha_{j_\text{fires}}&\text{ if }\lambda_{j_\text{fires}}(x^i_U)=y'\\
+        1-\alpha_{j_\text{fires}}&\text{ if }\lambda_{j_\text{fires}}(x^i_U)=-y'
+    \end{cases}\\
+    \leq&\text{Pr}[Y=y_m]\\
+    =&\sum_{y'\in\{-1,1\}}\text{Pr}[Y=y']\cdot\begin{cases}
+        1&\text{ if }y'=y_m\\
+        0&\text{ otherwise}
+    \end{cases}\\
+    =&\sum_{y'\in\{-1,1\}}\text{Pr}[Y=y']\cdot\prod_{i=1}^m\begin{cases}
+        \alpha^*_j&\text{ if }\lambda_j(x^i_U)=y'\\
+        1-\alpha^*_j&\text{ if }\lambda_j(x^i_U)=-y'\\
+        1&\text{ if }\lambda_j(x^i_U)=0
+    \end{cases}
+\end{align*}
+If no labeling function fires, then
+\begin{align*}
+    &\sum_{y'\in\{-1,1\}}\text{Pr}[Y=y']\cdot\prod_{j=1}^m\begin{cases}
+        \alpha_j&\text{ if }\lambda_j(x^i_U)=y'\\
+        1-\alpha_j&\text{ if }\lambda_j(x^i_U)=-y'\\
+        1&\text{ if }\lambda_j(x^i_U)=0
+    \end{cases}\\
+    =&\sum_{y'\in\{-1,1\}}\text{Pr}[Y=y']\\
+    =&1\\
+\end{align*}
+In each case, the maximum value attained by this expression occurs at the degenerate solution $\alpha^*$, which completes our proof.
+
+\section{Unipolar labeling function probability model}
+\label{appendix:unipolar_probs}
+
+We derive the following probability model for unipolar labeling functions.
+\begin{align}
+    \text{Pr}_{\alpha,\beta}[\lambda_j(X)=z\mid Y=c_j]&=\begin{cases}
+        \alpha_j\beta_j/\text{Pr}[Y=c_j]&\text{ if }z=c_j\\
+        1-\alpha_j\beta_j/\text{Pr}[Y=c_j]&\text{ if }z=0
+    \end{cases}\\
+    \text{Pr}_{\alpha,\beta}[\lambda_j(X)=z\mid Y=-c_j]&=\begin{cases}
+        (1-\alpha_j)\beta_j/\text{Pr}[Y=-c_j]&\text{ if }z=c_j\\
+        1-(1-\alpha_j)\beta_j/\text{Pr}[Y=-c_j]&\text{ if }z=0
+    \end{cases}
+\end{align}
+First, we examine the case where $Y=c_j$. We know that $\lambda_j(X)=Y$ if and only if both $\lambda_j(X)=c_j$ and $Y=c_j$. This allows us to write
+\begin{align*}
+    \text{Pr}_{\alpha,\beta}[\lambda_j(X)=c_j\mid Y=c_j]&=\frac{\text{Pr}_{\alpha,\beta}[\lambda_j(X)=c_j, Y=c_j]}{\text{Pr}[Y=c_j]}\\
+    &=\frac{\text{Pr}_{\alpha,\beta}[\lambda_j(X)=Y]}{\text{Pr}[Y=c_j]}\\
+    &=\frac{\text{Pr}_{\alpha,\beta}[\lambda_j(X)=Y\mid\lvert \lambda_j(X)\rvert=1]\cdot\text{Pr}_{\alpha,\beta}[\lvert \lambda_j(X)\rvert=1]}{\text{Pr}[Y=c_j]}\\
+    &=\alpha_j\beta_j/\text{Pr}[Y=c_j]
+\end{align*}
+We know that because $\lambda_j$ is unipolar
+\begin{equation*}
+    \text{Pr}_{\alpha,\beta}[\lambda_j(X)=-c_j\mid Y=c_j]=0
+\end{equation*}
+which means that
+\begin{equation*}
+    \text{Pr}_{\alpha,\beta}[\lambda_j(X)=0\mid Y=c_j]=1-\alpha_j\beta_j/\text{Pr}[Y=c_j]
+\end{equation*}
+Second, we examine the case where $Y=-c_j$. We know that $\lambda_j(X)=-Y$ if and only if both $z=c_j$ and $y=-c_j$. This means that
+\begin{align*}
+    \text{Pr}_{\alpha,\beta}[\lambda_j(X)=c_j\mid Y=-c_j]&=\frac{\text{Pr}_{\alpha,\beta}[\lambda_j(X)=c_j, Y=-c_j]}{\text{Pr}[Y=-c_j]}\\
+    &=\frac{\text{Pr}_{\alpha,\beta}[\lambda_j(X)=-Y]}{\text{Pr}[Y=-c_j]}\\
+    &=\frac{\text{Pr}_{\alpha,\beta}[\lambda_j(X)=-Y\mid\lvert \lambda_j(X)\rvert=1]\cdot\text{Pr}_{\alpha,\beta}[\lvert \lambda_j(X)\rvert=1]}{\text{Pr}[Y=-c_j]}\\
+    &=\frac{(1-\text{Pr}_{\alpha,\beta}[\lambda_j(X)=Y\mid\lvert \lambda_j(X)\rvert=1])\cdot\text{Pr}_{\alpha,\beta}[\lvert \lambda_j(X)\rvert=1]}{\text{Pr}[Y=-c_j]}\\
+    &=(1-\alpha_j)\beta_j/\text{Pr}[Y=-c_j]
+\end{align*}
+Similarly to before we know that
+\begin{equation*}
+    \text{Pr}_{\alpha,\beta}[\lambda_j(X)=-c_j\mid Y=-c_j]=0
+\end{equation*}
+and thus
+\begin{equation*}
+    \text{Pr}_{\alpha,\beta}[\lambda_j(X)=0\mid Y=-c_j]=1-(1-\alpha_j)\beta_j/\text{Pr}[Y=-c_j]
+\end{equation*}
+
+\section{Computing the Labeled Data Value Ratio}
+\label{appendix:ldvr_computation}
+
+To estimate the labeled data value ratio with parameters $\alpha_\text{mean},\beta_\text{mean}$ and $m$ we produce $100$ datasets. For each dataset, we randomly sample $n$ data points for $n\in\{100, 200, \hdots,10000\}$, train an unlabeled model and labeled model on these points, and evaluate the accuracy of each model over a test set of size $10000$. We compute the average accuracy for each value of $n$ over the $100$ datasets. Finally, we estimate the labeled data value according to
+\begin{equation}
+    \hat{r}=\argmin_r\sum_{n\in\{500,600,\hdots,10,000\}}\lvert \bar{A}_\text{unlabeled}(n)-\bar{A}_\text{labeled}(n/r)\rvert
+\end{equation}
+where $\bar{A}_\text{unlabeled}(n)$ is the mean performance of the unlabeled model trained on $n$ data points and $\bar{A}_\text{labeled}(n/r)$ is the mean performance of the labeled model trained on $n/r$ data points (interpolating linearly where $n/r\notin\{100,200,\hdots,10000\}$. We compute a single estimate $\hat{r}$ over the different values of $n$ because we find that the labeled data value generalizes across $n$, with $A_\text{unlabeled}(n)$ and $A_\text{labeled}(n/\hat{r})$ being close for different values of $n$. We choose to start at $n=500$ in the above expression because the accuracy gaps between consecutive values of $n$ for low $n$ are very large making these values of $n$ disproportionally important to our estimate of $r$.

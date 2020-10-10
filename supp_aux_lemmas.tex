@@ -1,0 +1,207 @@
+\section{Auxiliary Lemmas}
+
+
+\begin{lemma}
+Define $a_i = \E{}{\lf_i Y},$ and let $\widetilde{a}_i$ be our estimated accuracy on $n$ points. Furthermore, let $\bar{a}_i$ be the expected asymptotic value of $\widetilde{a}_i$ over $\tau$.   %$\bar{a}_i = \E{\tau}{\sqrt{\frac{\E{}{\lf_i \lf_j} \E{}{\lf_i \lf_k}}{\E{}{\lf_j \lf_k}}}},$ and $\widetilde{a}_i = \sqrt{\frac{\Ehat{\lf_i \lf_j} \Ehat{\lf_i \lf_k}}{\Ehat{\lf_j \lf_k}}}$ estimated on $n$ points. 
+Then, the estimation error is
+\begin{align*}
+\E{Y, \N, \tau}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )} = &\frac{1 + a_i}{2} \Big(\log\Big(1 + \frac{a_i - \bar{a}_i }{1 + \bar{a}_i}\Big) + \frac{\E{\N, \tau}{\bar{a}_i - \widetilde{a}_i}}{1 + \bar{a}_i} + \frac{1}{2(1 + \bar{a}_i)^2} \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}\Big) \\
+&+  \frac{1 - a_i}{2}\Big(\log\Big(1 + \frac{\bar{a}_i - a_i}{1 - \bar{a}_i} \Big) +   \frac{\E{\N, \tau}{\widetilde{a}_i - \bar{a}_i}}{1 - \bar{a}_i} + \frac{1}{2(1 - \bar{a}_i)^2} \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}\Big) \\
+&+ o(1/n).
+\end{align*}
+\label{lemma:KL_estimation}
+\end{lemma}
+
+\begin{proof}
+
+As discussed previously, this term is equal to $-\E{(Y, \bm{\lf}), \N, \tau}{\log \frac{\Ptilde(\lf_i' = \lf_i | Y' = Y)}{\Pr(\lf_i' = \lf_i | Y' = Y)}}$. By the law of total expectation, we now have
+\begin{align}
+    -\E{\bm{\lf}, \N, \tau}{ \Pr(Y = 1 | \bm{\lf}' = \bm{\lf}) \log \frac{\Ptilde(\lf_i' = \lf_i | Y = 1)}{\Pr(\lf_i' = \lf_i | Y = 1)} +  \Pr(Y = -1 | \bm{\lf}' = \bm{\lf}) \log \frac{\Ptilde(\lf_i' = \lf_i | Y = -1)}{\Pr(\lf_i' = \lf_i | Y = -1)}}.
+    \label{eq:estimation1}
+\end{align}
+
+Suppose $\lf_i \notin E_{\lf}$. Conditioning on the value of $\lf_i$ and using Lemma \textcolor{red}{CITE}, \eqref{eq:estimation1} becomes 
+\begin{align*}
+&-\E{\bm{\lf}_{-i}, \N, \tau}{\E{\lf_i}{\Pr(Y = 1 | \bm{\lf}' = \bm{\lf}) \log \frac{\Ptilde(\lf_i' = \lf_i | Y = 1)}{\Pr(\lf_i' = \lf_i | Y = 1) }  + \Pr(Y = -1 | \bm{\lf}' = \bm{\lf}) \log \frac{\Ptilde(\lf_i' = \lf_i | Y = -1)}{\Pr(\lf_i' = \lf_i | Y = -1)} \Big| \bm{\lf}_{-i}}} \\
+= \;&-\mathbb{E}_{\bm{\lf}_{-i}, \N, \tau}\bigg[\big(\Pr(Y = 1 | \bm{\lf}_{-i}, \lf_i = 1) \Pr(\lf_i = 1 | \bm{\lf}_{-i}) + \Pr(Y = -1 | \bm{\lf}_{-i}, \lf_i = -1) \Pr(\lf_i = -1 | \bm{\lf}_{-i}) \big)\log \frac{1 + \widetilde{a}_i}{1 + a_i} \\
+&+  \big(\Pr(Y = 1 | \bm{\lf}_{-i}, \lf_i = -1) \Pr(\lf_i = -1 | \bm{\lf}_{-i}) + \Pr(Y = -1 | \bm{\lf}_{-i}, \lf_i = 1) \Pr(\lf_i = 1 | \bm{\lf}_{-i})  \big)\log \frac{1 - \widetilde{a}_i}{1 - a_i} \bigg] \\
+= \;& -\mathbb{E}_{\bm{\lf}_{-i}, \N, \tau}\bigg[\Pr(\lf_i Y = 1 | \bm{\lf}_{-i}) \log \frac{1 + \widetilde{a}_i}{1 - a_i} + \Pr(\lf_i Y = -1 | \bm{\lf}_{-i})\log \frac{1 - \widetilde{a}_i}{1 - a_i} \bigg].
+\end{align*}
+
+Note that $\Pr(\lf_i = 1, Y = 1 | \bm{\lf}_{-i}) = \Pr(\lf_i = 1 | Y = 1)  \frac{\Pr(\bm{\lf}_{-i}, Y = 1)}{\Pr(\bm{\lf}_{-i})}$ and $\Pr(\lf_i = -1, Y = -1 | \bm{\lf}_{-i}) = \Pr(\lf_i = -1 | Y = -1) \frac{ \Pr(\bm{\lf}_{-i}, Y = -1)}{\Pr(\bm{\lf}_{-i})}$ since $\lf_i$ and $\lf_{-i}$ are conditionally independent given $Y$, so $\Pr(\lf_i Y = 1 | \bm{\lf}_{-i}) = \Pr(\lf_i = 1| Y = 1) = \frac{1 + a_i}{2}$. Similarly, $\Pr(\lf_i Y = -1 | \bm{\lf}_{}-i) = \Pr(\lf_i = -1 | Y = 1) = \frac{1 - a_i}{2}$, so the conditional KL divergence is equal to 
+\begin{align}
+\E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )} =-&\E{\N, \tau}{\frac{1 + a_i}{2} \log \frac{1 + \widetilde{a}_i}{1 + a_i} + \frac{1 - a_i}{2} \log \frac{1 - \widetilde{a}_i}{1 - a_i}}. \label{eq:estimation2}
+\end{align}
+
+Now suppose that $\lf_i \in E_{\lf}$ and has an edge to some $\lf_j$. When we simplify \eqref{eq:estimation1} by conditioning on $\lf_i, \lf_j$, we find that $\sum_{l \in \{\pm 1\}}\Pr(Y = 1 | \bm{\lf}_{-i, j}, \lf_i = 1, \lf_j = l) \Pr(\lf_i = 1, \lf_j = l | \bm{\lf}_{-i, j}) + \Pr(Y = -1 | \bm{\lf}_{-i, j}, \lf_i = -1, \lf_j = l) \Pr(\lf_i = -1, \lf_j = l | \bm{\lf}_{-i, j} )$ (i.e, the coefficient for $\log \frac{1 + \widetilde{a}_i}{1 + a_i}$) is equal to $\Pr(\lf_i Y = 1 | \bm{\lf}_{-i, j})$, and this is still equal to $\frac{1 + a_i}{2}$. The same holds for the coefficient of $\log \frac{1 - \widetilde{a}_i}{1 - a_i}$. Therefore, \eqref{eq:estimation2} holds for all $\lf_i$.
+
+Next, we evaluate $-\E{}{\log \frac{1 + \widetilde{a}_i}{1 + a_i}}$ and $-\E{}{\log \frac{1 - \widetilde{a}_i}{1 - a_i}}$, where expectation is over $\N$ and $\tau$. We apply a second-order Taylor approximation of $f(x) = \log \frac{1 + x}{1 + a_i}$ at $x = \bar{a}_i$:
+\begin{align*}
+\log \frac{1 + \widetilde{a}_i}{1 + a_i} \approx \log \frac{1 + \bar{a}_i}{1 + a_i} + \frac{1 + a_i}{1 + \bar{a}_i} \cdot \frac{1}{1 + a_i} (\widetilde{a}_i - \bar{a}_i) - \frac{1}{2(1 + \bar{a}_i)^2} (\widetilde{a}_i - \bar{a}_i)^2.
+\end{align*}
+
+
+Taking the expectation on both sides, we get 
+\begin{align*}
+-\E{\N, \tau}{\log \frac{1 + \widetilde{a}_i}{1 + a_i}} &\approx -\Big(\log \frac{1 + \bar{a}_i}{1 + a_i} + \frac{\E{\N, \tau}{\widetilde{a}_i} - \bar{a}_i}{1 + \bar{a}_i} - \frac{1}{2(1 + \bar{a}_i)^2} \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}\Big) + o(1/n) \\
+&= \log \Big(1 + \frac{a_i - \bar{a}_i}{1 + \bar{a}_i} \Big) + \frac{\E{\N, \tau}{\bar{a}_i - \widetilde{a}_i}}{1 + \bar{a}_i} + \frac{1}{2(1 + \bar{a}_i)^2} \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2} + o(1/n),
+\end{align*}
+where we have used Lemma \textcolor{red}{TAYLOR APPROXIMATION ERROR...need to expand out to interchange the $\tau$}. 
+
+Similarly, we apply a second-order Taylor approximation of $f(x) = \log \frac{1 - x}{1 - a_i}$ at $x = \bar{a}_i$:
+\begin{align*}
+\log \frac{1 - \widetilde{a}_i}{1 - a_i} \approx \log \frac{1 - \bar{a}_i}{1 - a_i} + \frac{1 - a_i}{1 - \bar{a}_i} \cdot \frac{-1}{1 - a_i} (\widetilde{a}_i - \bar{a}_i) - \frac{1}{2(1 - \bar{a}_i)^2} (\widetilde{a}_i - \bar{a}_i)^2.
+\end{align*}
+
+Taking the expectation of both sides,
+\begin{align*}
+-\E{}{\log \frac{1 - \widetilde{a}_i}{1 - a_i}} &= -\Big(\log \frac{1 - \bar{a}_i}{1 - a_i} + \frac{\E{\N, \tau}{\bar{a}_i - \widetilde{a}_i}}{1 - \bar{a}_i} - \frac{1}{2(1 - \bar{a}_i)^2} \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}\Big) + o(1/n) \\
+&= \log \Big(1 +  \frac{\bar{a}_i - a_i}{1 - \bar{a}_i}\Big) + \frac{\E{\N, \tau}{\widetilde{a}_i - \bar{a}_i}}{1 - \bar{a}_i} + \frac{1}{2(1 - \bar{a}_i)^2} \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2} + o(1/n).
+\end{align*}
+
+Substituting these expressions into \eqref{eq:estimation2}, we get our desired equation.
+
+%Note that when $i \notin E_{\lf}$, $\bar{a}_i \le a_i$ and so $\log \Big( 1 + \frac{\bar{a}_i - a_i}{1 - \bar{a}_i}\Big) \le 0$, $\log \Big(1 + \frac{a_i - \bar{a}_i}{1 + \bar{a}_i} \Big) \ge 0$.
+\end{proof}
+
+
+Taylor approximation error 
+
+\begin{lemma}
+If $(i, j) \in E_{\lf}$, then
+\begin{align}
+    \varepsilon_{ij} = \Delta_{ij} - \Delta_i a_j' - \Delta_j a_i' - \Delta_i \Delta_j,
+\end{align}
+
+where
+\begin{align}
+    \Delta_i &= \frac{2}{z_{ij} z_{ij}'} (\exp(\theta_{ij}) - \exp(-\theta_{ij})) (\exp(2\theta_j) - \exp(-2\theta_j)) \\
+    \Delta_j &= \frac{2}{z_{ij} z_{ij}'} (\exp(\theta_{ij}) - \exp(-\theta_{ij})) (\exp(2\theta_i) - \exp(-2\theta_i)) \\
+    \Delta_{ij} &= \frac{2}{z_{ij} z_{ij}'} (\exp(\theta_{ij}) - \exp(-\theta_{ij})) (\exp(2\theta_i) + \exp(-2\theta_i) + \exp(2\theta_j) + \exp(-2\theta_j)) \\
+    a_i' &= \frac{2}{z_{ij}'} \exp(\theta_i) (\exp(\theta_j) + \exp(-\theta_j)) - 1 \\
+    a_j' &= \frac{2}{z_{ij}'} \exp(\theta_j) (\exp(\theta_i) + \exp(-\theta_i)) - 1 \\
+    z_{ij} &= \sum_{{s_i, s_j}} \exp(s_i \theta_i + s_j \theta_j + s_i s_j \theta_{ij}) \\
+    z_{ij}' &=  \sum_{{s_i, s_j}} \exp(s_i \theta_i + s_j \theta_j)
+\end{align}
+
+
+Note that $\Delta_{ij} \ge 0$ as long as $\theta_{ij} \ge 0$, and $\Delta_i, \Delta_j \ge 0$ as long as $\sign{\theta_{ij}} = \sign{\theta_j}$ and $\sign{\theta_{ij}} = \sign{\theta_i}$ respectively. As a result, $\varepsilon \ge 0$.
+
+\label{lemma:varepsilon}
+
+\end{lemma}
+
+
+\begin{proof}
+We define a new distribution, which we denote by $\Pr'$ and $\mathbb{E}'$:
+\begin{align}
+    \mathrm{Pr}'(Y, \bm{\lf}) = \frac{1}{Z'} \exp \Big(\theta_Y + \sum_{i = 1}^m \theta_i \lf_i Y + \sum_{(k, l) \neq (i,j)} \theta_{kl} \lf_k \lf_l \Big).
+    \label{eq:wrong_pgm}
+\end{align}
+
+This distribution uses all the same canonical parameters as \eqref{eq:true_pgm} except $\theta_{ij} \lf_i \lf_j$. We know that for this distribution, $\Eprime{}{\lf_i \lf_j} = \Eprime{}{\lf_i Y} \Eprime{}{\lf_j Y}$. Our approach to compute $\varepsilon_{ij} = \E{}{\lf_i \lf_j} - \E{}{\lf_i Y} \E{}{\lf_j Y}$ is to bound the differences between $\mathbb{E}$ and $\mathbb{E}'$. 
+
+First, we evaluate $\E{}{\lf_i Y} - \E{}{\lf_j Y}$. We write $\E{}{\lf_i Y}$ as $2\Pr(\lf_i Y = 1) - 1 = \frac{2}{p} \Pr(\lf_i = 1, Y = 1) - 1$ and $\Eprime{}{\lf_i Y}$ as $\frac{2}{p} \Pr'(\lf_i = 1, Y = 1) - 1$  by Lemma \todo{CITE}, where $p = \Pr(Y = 1).$ Then, letting $s_{-i}$ represent all combinations of labels on all $\bm{\lf}$ besides $\lf_i$,
+\begin{align}
+    \Delta_i &= \E{}{\lf_i Y} - \Eprime{}{\lf_i Y} = \frac{2}{p} \sum_{s_{-i}} \exp \bigg(\theta_Y + \theta_i + \sum_{k \neq i} \theta_k l_k + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l \bigg) \left(\frac{\exp(\theta_{ij} l_j)}{Z} - \frac{1}{Z'} \right)
+\end{align}
+
+Next, note that $p = \frac{z_Y}{Z}$ and $p = \frac{z_Y'}{Z'}$, where $z_Y = \sum_{s} \exp(\theta_Y + \sum_{k = 1}^m \theta_k s_k + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l + \theta_{ij} s_i s_j)$ and  $z_Y' = \sum_s \exp(\theta_Y + \sum_{k = 1}^m \theta_i s_i + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l)$ (we can check these expressions for $p$ are equal, since the edgewise potentials are canceled out). $\Delta_i$ is now 
+\begin{align}
+     &2 \exp(\theta_i) \sum_{s_{-i}} \exp \bigg(\theta_Y + \sum_{k \neq i} \theta_k l_k + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l\bigg) \bigg(\frac{\exp(\theta_{ij} l_j)}{z_Y} - \frac{1}{z_Y'} \bigg) \\
+     = &2 \exp(\theta_i + \theta_j) \sum_{s_{-i, j}} \exp \bigg(\theta_Y + \sum_{k \neq i, j} \theta_k l_k + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l\bigg) \bigg(\frac{\exp(\theta_{ij})}{z_Y} - \frac{1}{z_Y'} \bigg) \\
+     + &2 \exp(\theta_i - \theta_j) \sum_{s_{-i, j}} \exp \bigg(\theta_Y + \sum_{k \neq i, j} \theta_k l_k + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l\bigg) \bigg(\frac{\exp(-\theta_{ij})}{z_Y} - \frac{1}{z_Y'} \bigg)
+\end{align}
+
+$\frac{\exp(\pm \theta_{ij})}{z_Y} - \frac{1}{z_Y'}$ can be written as $\frac{1}{z_Y z_Y'} \sum_{s'} \exp(\theta_Y + \sum_k \theta_k s_k' + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k' s_l') (\exp(\pm \theta_{ij}) - \exp(\theta_{ij} s_i' s_j'))$. Then for positive $\theta_{ij}$, this becomes $\frac{1}{z_Y z_Y'} (\exp(\theta_i - \theta_j) + \exp(-\theta_i + \theta_j))\sum_{s'} \exp(\theta_Y + \sum_{k \neq i, j} \theta_k s_k' + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k' s_l') (\exp(\theta_{ij}) - \exp(-\theta_{ij}))$, and for negative $-\theta_{ij}$, this becomes $\frac{1}{z_Y z_Y'} (\exp(\theta_i + \theta_j) + \exp(-\theta_i - \theta_j))\sum_{s'} \exp(\theta_Y + \sum_{k \neq i, j} \theta_k s_k' + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k' s_l') (\exp(-\theta_{ij}) - \exp(\theta_{ij}))$. Then, our expression becomes
+\begin{align}
+    \frac{2}{z_Y z_Y'} \bigg(\sum_{s_{-i, j}} &\exp \Big(\theta_Y + \sum_{k \neq i, j} \theta_k l_k + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l\Big)\bigg)^2   (\exp(\theta_{ij}) - \exp(-\theta_{ij})) \\
+    &\times \big(\exp(\theta_i + \theta_j) (\exp(\theta_i - \theta_j) + \exp(-\theta_i + \theta_j)) - \exp(\theta_i - \theta_j) (\exp(\theta_i + \theta_j) +\exp(-\theta_i - \theta_j)) \big)
+\end{align}
+
+The second line simplifies $\exp(2\theta_i) + \exp(2\theta_j) - \exp(2\theta_i) - \exp(-2\theta_j) = \exp(2\theta_j) - \exp(-2\theta_j)$. Lastly, note that $z_Y = \sum_{s_{-i, j}} \exp \Big(\theta_Y + \sum_{k \neq i, j} \theta_k l_k + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l\Big) \cdot \sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j + s_i s_j \theta_{ij})$, and $z_Y' = \sum_{s_{-i, j}} &\exp \Big(\theta_Y + \sum_{k \neq i, j} \theta_k l_k + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l\Big) \cdot \sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j)$. Canceling out the summations over the other labeling functions, we have our desired expression for $\Delta_i$. We can do the same to get our result for $\Delta_j$.
+
+Next, we compute $\Delta_{ij} = \E{}{\lf_i \lf_j} - \Eprime{}{\lf_i \lf_j},$ which is equal to $2(\Pr(\lf_i = 1, \lf_j = 1) - \Pr'(\lf_i = 1, \lf_j = 1) + \Pr(\lf_i = -1, \lf_j = -1) - \Pr'(\lf_i = -1, \lf_j = -1))$:
+\begin{align}
+    \Pr(\lf_i = 1, \lf_j = 1) &- \mathrm{Pr}'(\lf_i = 1, \lf_j = 1)  \\
+    &= \sum_{Y, s_{-i, j}} \exp \Big(\theta_Y Y + \theta_i Y + \theta_j Y + \sum_{k \neq i, j} \theta_k s_k Y + \sum_{(k, l) \in (i, j)} \theta_{kl} s_k s_l\Big) \left(\frac{\exp(\theta_{ij})}{Z} - \frac{1}{Z'} \right) \\
+    \Pr(\lf_i = -1, \lf_j = -1) &- \mathrm{Pr}'(\lf_i = -1, \lf_j = -1)  \\
+    &= \sum_{Y, s_{-i, j}} \exp \Big(\theta_Y Y - \theta_i Y - \theta_j Y + \sum_{k \neq i, j} \theta_k s_k Y + \sum_{(k, l) \in (i, j)} \theta_{kl} s_k s_l\Big) \left(\frac{\exp(\theta_{ij})}{Z} - \frac{1}{Z'} \right)
+\end{align}
+
+We can write $\frac{\exp(\theta_{ij})}{Z} - \frac{1}{Z'}$ as $\frac{1}{Z' Z} \sum_{Y, s} \exp\big(\theta_Y Y + \sum_{k = 1}^m \theta_k s_k Y + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l\big) (\exp(\theta_{ij}) - \exp(\theta_{ij} s_i s_j))$, which is equal to $\frac{1}{Z' Z} (\exp(\theta_{ij}) - \exp(-\theta_{ij})) (\exp(\theta_i - \theta_j) + \exp(-\theta_i + \theta_j)) \sum_{Y, s_{-i, j}} \exp\big(\theta_Y Y + \sum_{k \neq i, j} \theta_k s_k Y + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l\big)$. Therefore, $\Delta_{ij}$ is equal to
+\begin{align}
+    \Delta_{ij} =& 2 \left(\frac{\exp(\theta_{ij})}{Z} - \frac{1}{Z'} \right) \sum_{Y, s_{-i, j}} \exp \big(\theta_Y Y + \sum_{k \neq i, j} \theta_k s_k Y + \sum_{(k, l) \in (i, j)} \theta_{kl} s_k s_l\big) \big(\exp(\theta_i Y + \theta_j Y) + \exp(-\theta_i Y - \theta_j Y) \big) \\
+    =& \frac{2}{Z' Z} (\exp(\theta_{ij}) - \exp(-\theta_{ij})) (\exp(\theta_i - \theta_j) + \exp(-\theta_i + \theta_j))(\exp(\theta_i + \theta_j) + \exp(-\theta_i - \theta_j))  \\
+    & \times \bigg(\sum_{Y, s_{-i, j}} \exp \big(\theta_Y Y + \sum_{k \neq i, j} \theta_k s_k Y + \sum_{(k, l) \in (i, j)} \theta_{kl} s_k s_l\big)\bigg)^2 \\
+    =& \frac{2}{Z' Z} (\exp(\theta_{ij}) - \exp(-\theta_{ij})) (\exp(2\theta_i) + \exp(-2\theta_i) + \exp(2\theta_j) + \exp(-2\theta_j))  \\
+    & \times \bigg(\sum_{Y, s_{-i, j}} \exp \big(\theta_Y Y + \sum_{k \neq i, j} \theta_k s_k Y + \sum_{(k, l) \in (i, j)} \theta_{kl} s_k s_l\big)\bigg)^2
+\end{align}
+
+Note that $Z = \sum_{Y, s_{-i, j}} \exp(\theta_Y Y + \sum_{k \neq i, j} \theta_k s_k Y + \sum_{(k, l) \in (i, j)} \theta_{kl} s_k s_l) \sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j + s_i s_j \theta_{ij})$ and $Z' = \sum_{Y, s_{-i, j}} \exp(\theta_Y Y + \sum_{k \neq i, j} \theta_k s_i Y + \sum_{(k, l) \in (i, j)} \theta_{kl} s_k s_l) \sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j)$. Plugging this back in and canceling out summations, we obtain our desired result for $\Delta_{ij}$.
+
+
+We now can compute $\varepsilson_{ij}$:
+\begin{align}
+    \varepsilon_{ij} &= \E{}{\lf_i \lf_j} - \E{}{\lf_i Y} \E{}{\lf_j Y} = \Eprime{}{\lf_i \lf_j} + \Delta_{ij} - (\Eprime{}{\lf_i Y} + \Delta_i)(\Eprime{}{\lf_j Y} + \Delta_j) \\
+    &= \Delta_{ij} - \Delta_i \Eprime{}{\lf_j Y} - \Delta_j \Eprime{}{\lf_i Y} - \Delta_i \Delta_j
+\end{align}
+
+
+
+Lastly, we compute $\Eprime{}{\lf_i Y}$ and $\Eprime{}{\lf_j Y}$:
+\begin{align}
+    \Eprime{}{\lf_i Y} = &2 \left(\textrm{Pr}'(\lf_i = 1, Y = 1) + \textrm{Pr}'(\lf_i = -1, Y = -1) \right) - 1 \\
+    = &\frac{2}{Z'} \exp(\theta_i) (\exp(\theta_j) + \exp(-\theta_j)) \\
+    & \times \sum_{s_{-i, j}} \exp \Big( \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l\Big) \Big(\exp\Big(\theta_Y + \sum_{k \neq i, j} \theta_k s_k\Big) + \exp\Big(-\theta_Y - \sum_{k \neq i, j} \theta_k s_k\Big)\Big) - 1
+\end{align}
+
+$Z'$ can be written as $\sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j) \sum_{s_{-i, j}} \exp \Big(\sum_{(k, l) \notin (i, j)} \theta_{kl} s_k s_l \Big)\Big(\exp(\theta_Y + \sum_{k \neq i, j} \theta_k s_k) + \exp(-\theta_Y - \sum_{k \neq i, j} \theta_k s_k) \Big)$, Therefore $\Eprime{}{\lf_i Y}$ is equal to
+\begin{align}
+    \Eprime{}{\lf_i Y} &= \frac{2 \exp(\theta_i) (\exp(\theta_j) + \exp(-\theta_j))}{\sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j)} - 1
+\end{align}
+
+\end{proof}
+
+
+\begin{lemma}
+
+\begin{align*}
+\E{\N, \tau}{\widetilde{a}_i - \bar{a}_i} &\le \frac{\sqrt{3}}{2\sqrt{n_U}} \cdot \sqrt{\frac{1 - b_{\min}^2}{b_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)}\\
+\E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2} &\le \frac{3}{4 n_U} \cdot \frac{1 - b_{\min}^2}{b_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)
+\end{align*}
+\label{lemma:sampling_error}
+\end{lemma}
+
+\begin{proof}
+First, note that $\E{\N, \tau}{\bar{a}_i - \widetilde{a}_i} = \E{\N, \tau}{\E{\tau}{\bar{a}_i^{(j, k)}} - \widetilde{a}_i} = \E{\N, \tau}{\bar{a}_i^{(j, k)} - \widetilde{a}_i}$. Therefore, is it sufficient to produce an upper bound on $\E{\N}{\bar{a}_i - \widetilde{a}_i | \lf_j, \lf_k}$ independent of $j, k$. For ease of notation, we efer to this expectation as $\E{}{\bar{a}_i - \widetilde{a}_i}$. Then, $\E{}{\bar{a}_i - \widetilde{a}_i} = \E{}{ \frac{\bar{a}_i^2 - \widetilde{a}_i^2}{\bar{a}_i + \widetilde{a}_i} } \le  \frac{1}{2b_{\min}} \E{}{|\bar{a}_i^2 - \widetilde{a}_i^2 |}$. Denote $M_{ij} = \E{}{\lf_i \lf_j}$ and $\hat{M}_{ij} = \Ehat{\lf_i \lf_j}$. Then, by definition of our estimator in \eqref{eq:triplet},
+\begin{align}
+    \E{}{\bar{a}_i - \widetilde{a}_i} &\le \frac{1}{2b_{\min}} \E{}{\frac{\hat{M}_{ij} \hat{M}_{ik}}{\hat{M}_{jk} M_{jk}} |\hat{M}_{jk} - M_{jk}| + \frac{\hat{M}_{ij}}{M_{jk}}|\hat{M}_{ik} - M_{ik}| + \frac{M_{ik}}{M_{jk}} |\hat{M}_{ij} - M_{ij} | } \label{eq:M_decomposition} \\
+    &\le \frac{1}{2b_{\min}} \E{}{\frac{1}{b_{\min}^2} |\delta_{jk}| + \frac{1}{b_{\min}} |\delta_{ik} | + \frac{1}{b_{\min}}|\delta_{ij} |},\nonumber
+\end{align}
+
+where $\delta_{ij} = \hat{M}_{ij} - M_{ij}$ is the estimation error for the pairwise expectations. Using Cauchy-Schwarz inequality,
+\begin{align*}
+    \E{}{\bar{a}_i - \widetilde{a}_i} &\le \frac{1}{2b_{\min}} \sqrt{\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2}} \E{}{\sqrt{\delta_{ij}^2 + \delta_{ik}^2 + \delta_{jk}^2}} \\
+    &\le \frac{1}{2b_{\min}} \sqrt{\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2}} \sqrt{\Var{}{\hat{M}_{ij}} + \Var{}{\hat{M}_{ik}} + \Var{}{\hat{M}_{jk}}} 
+\end{align*}
+
+Formally, $\hat{M}_{ij} = \frac{1}{n_U} \sum_{l = 1}^{n_U} \lf_i^l \lf_j^l$. Therefore, $\Var{}{M_{ij}} = \frac{1}{n_U^2} \sum_{l = 1}^{n_U} \E{}{\lf_i^{l2} \lf_j^{l2}} - M_{ij}^2 = \frac{1 - M_{ij}^2}{n_U} \le \frac{1 - b_{\min}^2}{n_U}$, and our bound becomes
+\begin{align*}
+    \E{}{\bar{a}_i - \widetilde{a}_i} \le \frac{\sqrt{3}}{2\sqrt{n_U}} \cdot \sqrt{\frac{1 - b_{\min}^2}{b_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)}
+\end{align*}
+
+
+Next, to bound $\E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}$, it is sufficient to upper bound $\E{\N}{(\widetilde{a}_i - \bar{a}_i)^2 \; | \; \lf_j, \lf_k}$ independent of choice of $j$ and $k$. Refer to this expectation as $\E{}{(\widetilde{a}_i - \bar{a}_i)^2}$. Then, $\E{}{(\widetilde{a}_i - \bar{a}_i)^2 } = \E{}{\frac{(\widetilde{a}_i^2 - \bar{a}_i^2)^2}{(\widetilde{a}_i + \bar{a}_i)^2}} \le \frac{1}{4b_{\min}^2} \E{}{(\widetilde{a}_i^2 - \bar{a}_i^2)^2}$. Similar to \eqref{eq:M_decomposition},
+\begin{align}
+    \E{}{(\widetilde{a}_i - \bar{a}_i)^2 } &\le \frac{1}{4b_{\min^2}} \E{}{\left(\frac{\hat{M}_{ij} \hat{M}_{ik}}{\hat{M}_{jk} M_{jk}} |\hat{M}_{jk} - M_{jk}| + \frac{\hat{M}_{ij}}{M_{jk}}|\hat{M}_{ik} - M_{ik}| + \frac{M_{ik}}{M_{jk}} |\hat{M}_{ij} - M_{ij} |  \right)^2} \\
+    &\le \frac{1}{4b_{\min}^2} \E{}{\left(\frac{1}{b_{\min}^2} |\delta_{jk}| + \frac{1}{b_{\min}} |\delta_{ik} | + \frac{1}{b_{\min}}|\delta_{ij} | \right)^2} \\
+    &\le \frac{1}{4b_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2}\right) \left(\Var{}{\hat{M}_{ij}} + \Var{}{\hat{M}_{ik}} + \Var{}{\hat{M}_{jk}}\right) \\
+    &\le \frac{3}{4 n_U} \cdot \frac{1 - b_{\min}^2}{b_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)
+\end{align}
+
+
+\end{proof}
+
+Stuff about graphical model properties
+

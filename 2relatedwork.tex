@@ -1,0 +1,16 @@
+ \section{Related Work}
+
+\paragraph{Misspecification in Graphical Models}
+
+The effect of model misspecification on parameter estimation has been studied in the asymptotic setting by \cite{kleijn2012}, who extend the Bernstein-Von Mises theorem to cases where observed samples are not of the parametric distribution being estimated. They find that certain estimators, such as MLE, converge to a normal distribution centered at the point that results in a parametrized distribution closest in Kullback-Leibler divergence to the true distribution, and this property is directly used in asymptotic analysis of estimators in Bayesian and variational inference \cite{wang2019variational, hongmartin2020}. However, this property does not apply to method-of-moments estimators that are commonly used in weak supervision. Other approaches to analyzing model misspecification directly examine families of graphical models, such as \cite{JogL15}'s lower bound on KL-separation of Gaussian graphical models. While a version of their mutual information bounds appear as an inference bias in our error analysis, this does not illustrate the additional error in parameter estimation on the weakly labeled dataset. More generally, works on misspecification either study a particular class of techniques \cite{Blasi13} or a particular model and propose repairs \cite{Grunwald17}, but do not compare between alternative datasets as we seek to.
+
+\paragraph{Structure Learning}
+One way to reduce misspecification is to produce a more refined model. Graphical model structure learning aims to do so; there are many works in the supervised case \cite{Ravikumar11, Loh13} and in the unsupervised/weakly supervised settings \cite{Chandrasekaran12,Meng14, bach2017learning, varma2019learning}. However, these works present computational challenges, require certain (often strong) conditions to hold, and do not analyze the downstream impact of errors in model selection. Our approach instead focuses on understanding the impact of such errors.
+
+\paragraph{Semi-Supervised Learning}
+Semi-supervised learning involves a small set of labeled points and a much larger set of unlabeled points \cite{Chapelle09, zhu2009introduction}. There are a wide variety of such techniques. A standard approach is to model the missing labels as latent variables and to run expectation maximization (EM) \cite{Nigam2000}. Another popular class of techniques uses a graph structure to propagate labels, relying on MRFs \cite{Zhu02} or kernels \cite{Kondor02}.
+
+\paragraph{Method-of-Moments Estimators}
+\todo{discuss Anima/Percy/Rong/Ankur papers and multi-view learning - many of these revolve around notions of conditional independence and thus are equally subject to the same type of misspecification as our approach. Mention how we can actually use some of their approaches to learn accuracy parameters (discussed in Appendix?), but the same problems persist.}
+
+\todo{maybe data shapley or stuff like that?}

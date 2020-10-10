@@ -1,0 +1,104 @@
+\section{Learning From a Small Number of Labeled Data Points}
+
+We propose a simple approach for producing noisy labels using labeling functions, unlabeled data points and labeled data points. Because we focus on the setting where the number of available labeled points is small, we maintain the standard strategy of estimating two parameters per labeling function, accuracy and coverage, rather than using more complex models. We use a maximum likelihood estimation approach, defining separate log-likelihood objectives for the unlabeled and labeled sets and use the semi-supervised technique of optimizing a weighted average of these objectives. Unlike the maximum likelihood estimation method from \cite{alex2016data}, we model separate probabilities of firing and being correct depending on the gold label. We describe the technical details of this modified model in Section \ref{sec:mle_unipolar} and then define our combined objective in Section \ref{sec:joint_objective}.
+
+\subsection{Maximum likelihood estimation with unipolar labeling functions}
+\label{sec:mle_unipolar}
+
+Maximum likelihood estimation for data programming maximizes the log-likelihood of the observed labeling function outputs with respect to labeling function accuracies $\alpha\in\mathbb{R}^m$ and coverages $\beta\in\mathbb{R}^m$. Note that this requires marginalizing over the unobserved gold labels. More concretely, given unlabeled dataset $\boldsymbol{X}_U$ and labeling functions $\lambda$ we find $\alpha$ and $\beta$ which maximize 
+\begin{align}
+    \ell_\text{unlabeled}(\boldsymbol{X}_U,\lambda,\alpha,\beta)&=\log\prod_{i=1}^{n_U}\text{Pr}_{\alpha,\beta}[\lambda(X)=\lambda(x^i_U)]\\
+    % &=\sum_{i=1}^{n_U}\log\sum_{y'\in\{-1,1\}}\text{Pr}_{\alpha,\beta}[\lambda(X)=\lambda(x^i_U), Y=y']\\
+    &=\sum_{i=1}^{n_U}\log\sum_{y'\in\{-1,1\}}\text{Pr}[Y=y']\cdot\prod_{j=1}^m\text{Pr}_{\alpha,\beta}[\lambda_j(X)=\lambda_j(x^i_U)\mid Y=y']
+\end{align}
+where the second equation follows from the conditional independence of labeling functions. The previous proposed method for maximum likelihood estimation from \cite{alex2016data} uses the following model for the probability of observing some labeling function outputs conditioned on the gold label
+\begin{equation}
+    \text{Pr}_{\alpha,\beta}[\lambda_j(X)=z\mid Y=y]=\begin{cases}
+        \alpha_j\beta_j&\text{ if }z=y\\
+        (1-\alpha_j)\beta_j&\text{ if }z=-y\\
+        (1-\beta_j)&\text{ if }z=0
+    \end{cases}
+\end{equation}
+According to this model, labeling functions are equally likely abstain when the gold label is $1$ and when the gold label is $-1$ (the probability is always $1-\beta_j$). This can be problematic: consider \textit{unipolar} labeling functions, which only ever predict one class. For example, a labeling function for spam email detection might predict $1$ when the email starts with a lowercase letter and abstain otherwise. Clearly, this labeling function is more likely to abstain on non-spam emails, very few of which would start with a lowercase letter, than on spam emails. When every labeling function is unipolar the maximum likelihood estimate of $\alpha$ with the above model is actually degenerate: every labeling function with one class has an estimated accuracy of $1$ and every labeling function with the other class has an estimated accuracy of $0$ (e.g., positive labeling functions are always correct and negative labeling functions are always incorrect). We provide the details in Section \ref{appendix:degenerate_solution} of the appendix. 
+
+% Often, labeling functions are \textit{unipolar}, meaning that they only ever predict one class. For instance, a labeling function for spam email detection might output $1$ when the email starts with a lowercase letter and abstain otherwise. We define the \textit{class} of a unipolar labeling function to be the class that it predicts when it fires. Unipolar labeling functions are problematic for the above model, since they are clearly more likely to fire when the gold label is their class, and are more likely to abstain when the gold label is opposite their class. When every labeling function is unipolar the maximum likelihood estimate of $\alpha$ with the above model is degenerate: every labeling function with one class has an estimated accuracy of $1$ and every labeling function with the other class has an estimated accuracy of $0$ (e.g., positive labeling functions are always correct and negative labeling functions are always incorrect). We show that is the case in the \hyperref[appendix:degenerate_solution]{appendix} \steve{when you reference the appendix, reference the section in the appendix too}.
+
+This degeneracy issue was originally addressed with regularization. We instead address the root problem by modeling different probabilities of abstaining for different gold labels, which we find improves empirical performance over regularization. Intuitively, modeling separate abstain probabilities for different classes for unipolar labeling functions means that we can consider abstains to be ``weak'' votes for the opposite class. Let $c_j$ denote the \textit{class} of the unipolar labeling function $\lambda_j$ (the single class that $\lambda_j$ outputs). Then the following probability model holds
+\begin{align}
+    \text{Pr}_{\alpha,\beta}[\lambda_j(X)=z\mid Y=c_j]&=\begin{cases}
+        \alpha_j\beta_j/\text{Pr}[Y=c_j]&\text{ if }z=c_j\\
+        1-\alpha_j\beta_j/\text{Pr}[Y=c_j]&\text{ if }z=0
+    \end{cases}\\
+    \text{Pr}_{\alpha,\beta}[\lambda_j(X)=z\mid Y=-c_j]&=\begin{cases}
+        (1-\alpha_j)\beta_j/\text{Pr}[Y=-c_j]&\text{ if }z=c_j\\
+        1-(1-\alpha_j)\beta_j/\text{Pr}[Y=-c_j]&\text{ if }z=0
+    \end{cases}
+\end{align}
+We defer the derivation of these probabilities to Section \ref{appendix:unipolar_probs} of the appendix, but note that (with balanced classes and $\alpha_j>1/2$) the probability of abstaining when $Y=c_j$ is smaller than the probability of abstaining when $Y=-c_j$, as expected.
+When dealing with non-unipolar labeling functions, we simply ``split'' every non-unipolar labeling functions into two unipolar labeling functions, one for the positive predictions and one for the negative predictions.
+
+% \begin{equation}
+%     \text{Pr}_{\alpha,\beta}[\lambda_j(X)=z\mid Y=y]=\begin{cases}
+%         \begin{cases}
+%             \alpha_j\beta_j/\text{Pr}[Y=y]&\text{ if }y=\text{class}(\lambda_j)\\
+%             0&\text{ if }y=-\text{class}(\lambda_j)
+%         \end{cases}&\text{ if }z=y\\
+%         \begin{cases}
+%             0&\text{ if }y=\text{class}(\lambda_j)\\
+%             (1-\alpha_j)\beta_j/\text{Pr}[Y=y]&\text{ if }y=-\text{class}(\lambda_j)
+%         \end{cases}&\text{ if }z=-y\\
+%         \begin{cases}
+%             1-\alpha_j\beta_j/\text{Pr}[Y=y]&\text{ if }y=\text{class}(\lambda_j)\\
+%             1-(1-\alpha_j)\beta_j/\text{Pr}[Y=y]&\text{ if }y=-\text{class}(\lambda_j)
+%         \end{cases}&\text{ if }z=0\\
+%     \end{cases}
+% \end{equation}
+% \begin{equation}
+%     \text{Pr}_{\alpha,\beta}[\lambda_j(X)=z\mid Y=y]=\begin{cases}
+%         \begin{cases}
+%             \alpha_j\beta_j/\text{Pr}[Y=y]&\text{ if }z=y\\
+%             0&\text{ if }z=-y\\
+%             1-\alpha_j\beta_j/\text{Pr}[Y=y]&\text{ if }z=0
+%         \end{cases}&\text{ if }y=\text{class}(\lambda_j)\\
+%         \begin{cases}
+%             0&\text{ if }z=y\\
+%             (1-\alpha_j)\beta_j/\text{Pr}[Y=y]&\text{ if }z=-y\\
+%             1-(1-\alpha_j)\beta_j/\text{Pr}[Y=y]&\text{ if }z=0
+%         \end{cases}&\text{ if }y=-\text{class}(\lambda_j)
+%     \end{cases}
+% \end{equation}
+% We derive the case where $z=y$ and $\text{class}(\lambda_j)=y$ here and defer the rest to the \hyperref[appendix:unipolar_probs]{appendix}. For unipolar labeling function $\lambda_j$, we know that $z=y$ if and only if both $z=\text{class}(\lambda_j)$ and $y=\text{class}(\lambda_j)$ (because $z\in\{0,\text{class}(\lambda_j)\}$). Assuming for ease of notation that $\text{class}(\lambda_j)=1$, this allows us to write
+% \begin{align}
+%     \text{Pr}_{\alpha,\beta}[\lambda_j(X)=1\mid Y=1]&=\frac{\text{Pr}_{\alpha,\beta}[\lambda_j(X)=1, Y=1]}{\text{Pr}[Y=1]}\\
+%     &=\frac{\text{Pr}_{\alpha,\beta}[\lambda_j(X)=Y]}{\text{Pr}[Y=1]}\\
+%     &=\frac{\text{Pr}_{\alpha,\beta}[\lambda_j(X)=Y\mid\lvert \lambda_j(X)\rvert=1]\cdot\text{Pr}_{\alpha,\beta}[\lvert \lambda_j(X)\rvert=1]}{\text{Pr}[Y=1]}\\
+%     &=\alpha_j\beta_j/\text{Pr}[Y=1]
+% \end{align}
+
+\subsection{Learning from both unlabeled and labeled data}
+\label{sec:joint_objective}
+
+Similarly to the maximum likelihood objective we defined over our unlabeled data, we define the log-likelihood objective over labeled data as
+\begin{align}
+    \ell_\text{labeled}(\boldsymbol{X}_L,\boldsymbol{Y}_L,\lambda,\alpha,\beta)&=\log\prod_{i=1}^{n_L}\text{Pr}_{\alpha,\beta}[\lambda(X)=\lambda(x^i_L),Y=y^i_L]\\
+    &=\sum_{i=1}^{n_L}\log\text{Pr}[Y=y^i_L]+\sum_{j=1}^m\log\text{Pr}_{\alpha,\beta}[\lambda(X)=\lambda_j(x^i_L)\mid Y=y^i_L]
+\end{align}
+We finally define the combined objective
+\begin{equation}
+    L(\boldsymbol{X}_U,\boldsymbol{X}_L,\boldsymbol{Y}_L,\lambda,\alpha,\beta)=\gamma\cdot\ell_\text{unlabeled}(\boldsymbol{X}_U,\lambda,\alpha,\beta)+\ell_\text{labeled}(\boldsymbol{X}_L,\boldsymbol{Y}_L,\lambda,\alpha,\beta)
+\end{equation}
+for some parameter $\gamma\in[0,1]$ representing the relative weight of an unlabeled point compared to a labeled point (for example, if $\gamma=1$ then unlabeled and labeled points are weighted equally). For both the unlabeled and labeled objectives we defined, the optimal value for $\beta$ is the empirical coverages over the dataset. This poses a problem for our combined objective because of our unequal treatment of labeled and unlabeled data points when $\gamma<1$: the estimated $\beta$ would be skewed towards the empirical coverages over our $n_L$ labeled points rather than being the empirical estimate over the $n_U+n_L$ points. We solve this problem by first computing the empirical coverages
+\begin{equation}
+    \hat{\beta_j}=\frac{1}{n_U+n_L}(\sum_{i=1}^{n_U}\lvert\lambda_j(x^i_U)\rvert+\sum_{i=1}^{n_L}\lvert\lambda_j(x^i_L)\rvert)
+\end{equation}
+We then fix $\hat{\beta}$ and maximize our objective with respect to $\alpha$ using gradient descent to produce accuracy estimates
+\begin{equation}
+    \hat{\alpha}=\argmax_\alpha L(\boldsymbol{X}_U,\boldsymbol{X}_L,\boldsymbol{Y}_L,\lambda,\alpha,\hat{\beta})
+\end{equation}
+
+\subsection{Aggregating labeling function outputs into noisy labels}
+
+With our estimates $\hat{\alpha}$ and $\hat{\beta}$ we produce noisy label for unlabeled data point $x$ according to $\hat{y}=\text{Pr}_{\hat{\alpha},\hat{\beta}}[Y=1\mid\lambda(x)]$ where
+\begin{equation}
+    \text{Pr}_{\hat{\alpha},\hat{\beta}}[Y=1\mid\lambda(X)=\lambda(x)]=\frac{\text{Pr}_{\hat{\alpha},\hat{\beta}}[\lambda(X)=\lambda(x)\mid Y=1]\cdot\text{Pr}[Y=1]}{\sum_{y'\in\{-1,1\}}\text{Pr}_{\hat{\alpha},\hat{\beta}}[\lambda(X)=\lambda(x)\mid Y=y']\cdot\text{Pr}[Y=y']}
+\end{equation}

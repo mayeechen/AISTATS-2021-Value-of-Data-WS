@@ -1,0 +1,191 @@
+%\section{Analysis of Other Method-of-Moments Estimators}
+
+
+\section{Proofs}
+
+%We provide technical proofs of our theoretical contributions.
+First, we formally state our assumptions on the graphical model that are needed for our results.
+
+\begin{assumption}
+$a_{\min}, b_{\min}$ (b min is min over both bar b and tilde b?) all positives, edgeset 
+\end{assumption}
+
+\subsection{Proof of Theorem 1}
+
+Our goal is to evaluate $\E{(Y, \bm{\lf}), \N, \tau}{l(\widetilde{Y}, Y)}$, where $\N$ is the randomness over a sample of $n$ points (either $n_U$ or $n_L$). This expected cross entropy loss can be written as
+\begin{align}
+    \E{(Y, \bm{\lf}), \N, \tau}{l(\widetilde{Y}, Y)} &= - \E{(Y, \bm{\lf}), \N, \tau}{ \log \frac{\Ptilde(Y' = Y | \bm{\lf}' = \bm{\lf})}{\Pr(Y' = Y | \bm{\lf}' = \bm{\lf})}} + H(Y | \bm{\lf}) \label{eq:cross-entropy}
+\end{align}
+
+where $Y', Y$ and $\bm{\lf}', \bm{\lf}$ are independent copies, and the conditional entropy $H(Y | \bm{\lf})$ is by definition
+%we use the law of total expectation to write this expectation as
+%\begin{align}
+%&\E{\bm{\lf}, \N}{\E{Y}{-\left(\frac{1 + Y}{2}\right) \log \Ptilde(Y = 1 | \bm{\lf}' = \bm{\lf}) - \left(\frac{1 - Y}{2}\right) \log \Ptilde(Y = -1 | \bm{\lf}' = \bm{\lf}) \bigg| \bm{\lf}, \N}} \\
+%&= - \E{\bm{\lf}, \N}{ \Pr(Y = 1 | \bm{\lf}' = \bm{\lf}) \log \Ptilde(Y = 1 | \bm{\lf}' = \bm{\lf}) + \Pr(Y = -1 | \bm{\lf}' = \bm{\lf}) \log \Ptilde(Y = -1 | \bm{\lf}' = \bm{\lf}) } \\
+%&=  - \E{\bm{\lf}, \N}{ \Pr(Y = 1 | \bm{\lf}' = \bm{\lf}) \log \frac{\Ptilde(Y = 1 | \bm{\lf}' = \bm{\lf})}{\Pr(Y = 1 | \bm{\lf}' = \bm{\lf})} + \Pr(Y = -1 | \bm{\lf}' = \bm{\lf}) \log \frac{\Ptilde(Y = -1 | \bm{\lf}' = \bm{\lf})}{\Pr(Y = -1 | \bm{\lf}' = \bm{\lf})} } + H(Y | \bm{\lf}), \label{eq:tower}
+%\end{align}
+%where the conditional entropy $H(Y | \bm{\lf})$ is by definition
+\begin{align}
+    H(Y | \bm{\lf}) &= \E{\bm{\lf}}{- \Pr(Y = 1 | \bm{\lf}' = \bm{\lf}) \log \Pr(Y = 1 | \bm{\lf}' = \bm{\lf}) - \Pr(Y = -1 | \bm{\lf}' = \bm{\lf}) \log \Pr(Y = 1 | \bm{\lf}' = \bm{\lf})}.
+\end{align}
+
+Next, we evaluate $ \log \frac{\Ptilde(Y' = Y | \bm{\lf}' = \bm{\lf})}{\Pr(Y = 1 | \bm{\lf}' = \bm{\lf})}$. Define $\Pbar$ to be the conditionally independent label model parametrized by the true accuracies $a = \E{}{\bm{\lf} Y}$ in the asymptotic regime; similar to $\Ptilde$'s definition in \eqref{eq:inference}, 
+\begin{align}
+    \Pbar(Y' = Y | \bm{\lf} =  \bm{\lf}(X)) &= \frac{\Pbar(\bm{\lf} = \bm{\lf}(X) | Y' = Y) \Pr(Y' = Y)}{\Pr(\lf = \lf(X))} = \frac{\prod_{i = 1}^m \Pr(\lf_i = \lf_i(X) | Y' = Y) \Pr(Y = 1)}{\Pr(\lf = \lf(X))}
+\end{align}
+
+Then, 
+\begin{align*}
+ \log \frac{\Ptilde(Y' = Y | \bm{\lf}' = \bm{\lf})}{\Pr(Y' = Y | \bm{\lf}' = \bm{\lf})} &= \log \frac{\Ptilde(Y' = Y | \bm{\lf}' = \bm{\lf})}{\Pbar(Y' = Y | \bm{\lf}' = \bm{\lf})} + \log \frac{\Pbar(Y = 1 | \bm{\lf}' = \bm{\lf})}{\Pr(Y' = Y | \bm{\lf}' = \bm{\lf})} \\
+&= \sum_{i = 1}^m \log \frac{\Ptilde(\lf'_i = \lf_i | Y' = Y)}{\Pr( \lf'_i = \lf_i | Y' = Y)} + \log \frac{\Pr(\bm{\lf}' = \bm{\lf})}{\Phat(\bm{\lf}' = \bm{\lf})} + \log \frac{\Pbar(\bm{\lf}' = \bm{\lf} | Y' = Y)}{\Pr(\bm{\lf}' = \bm{\lf} | Y' = Y)}.
+\end{align*}
+
+We have used the fact that the class balance $\Pr(Y' = Y)$ is the same value across the true distribution, $\Ptilde$, and $\Pbar$. Plugging back into \eqref{eq:cross-entropy}, we get 
+\begin{align}
+    -\sum_{i = 1}^m \E{(Y, \bm{\lf}), \N, \tau}{\log \frac{\Ptilde(\lf_i' = \lf_i | Y' = Y)}{\Pr(\lf_i' = \lf_i | Y' = Y)}} - \E{(Y, \bm{\lf})}{\log \frac{\Pbar(\bm{\lf}' = \bm{\lf} | Y' = Y)}{\Pr(\bm{\lf}' = \bm{\lf} | Y' = Y)}} - \E{\bm{\lf}, \N}{\log \frac{\Pr(\bm{\lf}' = \bm{\lf})}{\Phat(\bm{\lf}' = \bm{\lf})}} + H(Y | \bm{\lf}) \label{eq:cross-entropy-2}
+\end{align}
+
+We simplify each expectation now. 
+
+\begin{enumerate}
+    \item $ -\sum_{i = 1}^m \E{(Y, \bm{\lf}), \N, \tau}{\log \frac{\Ptilde(\lf_i' = \lf_i | Y' = Y)}{\Pr(\lf_i' = \lf_i | Y' = Y)}}$:
+    
+    By definition of conditional KL divergence,
+    \begin{align}
+        &-\sum_{i = 1}^m \E{(Y, \bm{\lf}), \N, \tau}{\log \frac{\Ptilde(\lf_i' = \lf_i | Y' = Y)}{\Pr(\lf_i' = \lf_i | Y' = Y)}} = \sum_{i = 1}^m \E{(Y, \bm{\lf}), \N, \tau}{ \log \frac{\Pr(\lf_i' = \lf_i | Y' = Y )}{\Ptilde(\lf_i' = \lf_i | Y' = Y)}} \\
+        &=\sum_{i = 1}^m \E{\N, \tau}{\E{Y}{\KL(\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i' | Y})}}.
+    \end{align}
+    
+    \item $- \E{(Y, \bm{\lf})}{\log \frac{\Pbar(\bm{\lf}' = \bm{\lf} | Y' = Y)}{\Pr(\bm{\lf}' = \bm{\lf} | Y' = Y)}}$:
+
+    The key difference between $\Pbar$ and $\Pr$ is how the distributions factorize. The above expression can be written as
+    \begin{align*}
+    &-\sum_{(i, j) \in E_{\lf}} \E{\lf_i \lf_j, Y}{\log \frac{\Pr(\lf_i' = \lf_i | Y' = Y) \Pr(\lf_j' = \lf_j | Y' = Y)}{\Pr(\lf_i', \lf_j' = \lf_i, \lf_j | Y' = Y)}} \\
+    =& \sum_{(i, j) \in E_{\lf}} \E{\lf_i, \lf_j}{ \log \frac{\Pr(\lf_i', \lf_j' = \lf_i, \lf_j | Y = 1)}{\Pr(\lf_i' = \lf_i | Y = 1) \Pr(\lf_j' = \lf_j | Y = 1)} \bigg| \; Y = 1} \Pr(Y = 1)  \\
+    &+ \E{\lf_i, \lf_j}{ \log \frac{\Pr(\lf_i', \lf_j' = \lf_i, \lf_j | Y = -1)}{\Pr(\lf_i' = \lf_i | Y = -1) \Pr(\lf_j' = \lf_j | Y = -1)} \bigg| \; Y = -1} \Pr(Y = -1).
+    \end{align*}
+    
+    Note that these expectations are equal to the mutual information between $\lf_i$ and $\lf_j$ conditional on $Y = 1$ or $Y = -1$. Then by definition, the expression is equal to
+    \begin{align*}
+    \sum_{(i, j) \in E_{\lf}} I(\lf_i; \lf_j | Y = 1) \Pr(Y = 1) + I(\lf_i; \lf_j | Y = -1) \Pr(Y = -1) = \sum_{(i, j) \in E_{\lf}} I(\lf_i; \lf_j | Y).
+    \end{align*}
+
+
+    \item $-\E{\bm{\lf}, \N}{\log \frac{\Pr(\bm{\lf}' = \bm{\lf})}{\Phat(\bm{\lf}' = \bm{\lf})}}$: 
+    
+    This term is the expected negative KL divergence between the true and estimated distributions of $\bm{\lf}$, $\E{\N}{\KL(\Pr(\bm{\lf}) || \Phat(\bm{\lf}))}$. While there are many ways to estimate this distribution, we stick with simply the MLE estimate so that this expression will converge to $0$ asymptotically. 
+\end{enumerate}
+
+Therefore, \eqref{eq:cross-entropy-2} becomes
+\begin{align}
+    \E{(Y, \bm{\lf}), \N, \tau}{l(\widetilde{Y}, Y)} &= H(Y | \bm{\lf}) - \E{\N}{\KL (\Pr(\bm{\lf}) || \Phat(\bm{\lf}))} + \sum_{(i, j) \in E_{\lf}} I(\lf_i; \lf_j | Y) + \sum_{i = 1}^m \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )}, \nonumber 
+\end{align}
+
+which is our desired expression.
+
+\todo{bound mutual information}
+
+\subsection{Proof of Theorem 2}
+
+Our goal is to evaluate $\sum_{i = 1}^m \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )}$ on a labeled dataset. Using Lemma \ref{lemma:KL_estimation}, note that $\E{}{\widetilde{a}_i^L} = \bar{a}_i = a_i$. Therefore,
+\begin{align*}
+   \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )} &= \frac{1 + a_i}{2} \cdot \frac{1}{2(1 + a_i)^2} \E{}{(\widetilde{a}_i^L - a_i)^2} + \frac{1 - a_i}{2} \cdot \frac{1}{2(1 - a_i)^2} \E{}{(\widetilde{a}_i^L - a_i)^2} + o(1/n) \\
+   &=  \frac{1}{2(1 - a_i^2)} \Var{}{\widetilde{a}_i^L} + o(1/n)
+\end{align*}
+
+It can be shown that this is exactly $\frac{1}{2n_L}$. To see this, formally define $\widetilde{a}_i^L = \frac{1}{n_L} \sum_{j = 1}^{n_L} \lf_i^j Y^j$, where $\lf_i^j, Y^j$ belong the $j$th sample of the dataset. Then
+\begin{align}
+    \Var{}{\widetilde{a}_i^L} &= \frac{1}{n_L^2} \sum_{j = 1}^{n_L} \Var{}{\lf_i^j Y^j} = \frac{1}{n_L^2} \sum_{j = 1}^{n_L} \E{}{\lf_i^{j2} Y^{j2}} - \E{}{\lf_i Y}^2 = \frac{1 -a_i^2}{n_L}
+\end{align}
+
+Therefore, $\sum_{i = 1}^m \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )} = \frac{m}{2n_L} + o(1/n_L)$, and our proof is complete.
+
+\subsection{Proof of Theorem 3} 
+
+We state the full theorem with the value of the constants. \todo{fill this out}
+
+We apply Lemma \ref{lemma:KL_estimation} and simplify it to get
+\begin{align}
+    \sum_{i = 1}^m \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )} &= \sum_{i = 1}^m \Big(\frac{1 + a_i}{2} \log \Big(1 + \frac{a_i - \bar{a}_i}{1 + \bar{a}_i}\Big) + \frac{1 - a_i}{2} \log \Big(1 + \frac{\bar{a}_i - a_i}{1 - \bar{a}_i} \Big)\Big)  \\
+    &+ \sum_{i = 1}^m \frac{a_i - \bar{a}_i}{1 - \bar{a}_i^2} \E{\N, \tau}{\bar{a}_i - \widetilde{a}_i } 
+    + \sum_{i = 1}^m \frac{1}{2}\Big( \frac{1}{1 - \bar{a}_i^2} + \frac{2\bar{a}_i(\bar{a}_i - a_i)}{(1 - \bar{a}_i^2)^2}\Big) \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2} \\
+    &+ o(1/n).
+\end{align}
+
+This shows that there are three quantities to bound: $a_i - \bar{a}_i$, $\E{\N, \tau}{\bar{a}_i - \widetilde{a}_i}$, and $\E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}$. Recall that for the unlabeled data case, $\widetilde{a}_i = \sqrt{\frac{\Ehat{\lf_i \lf_j} \Ehat{\lf_i \lf_k}}{\Ehat{\lf_j \lf_k}}}$ for random $\lf_j, \lf_k$, and $\bar{a}_i = \E{\tau}{\sqrt{\frac{\E{}{\lf_i \lf_j} \E{}{\lf_i \lf_k}}{\E{}{\lf_j \lf_k}}}}$. The bounds for $\E{\N, \tau}{\bar{a}_i - \widetilde{a}_i}$, and $\E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}$ are stated in Lemma \ref{lemma:sampling_error}; we focus on bounding the expected asymptotic gap $a_i - \bar{a}_i$ here. 
+
+\begin{lemma}
+For $i \in E_{\lf}$, we have that
+\begin{align}
+    \bar{a}_i - a_i \in \bigg[\frac{\varepsilon_{\min} b_{\min}}{m - 1} - \frac{(d - 1)\varepsilon_{\max}}{(m - 1)(m - 2) b_{\min}^2 a_{\min}^2}, \; \frac{\varepsilon_{\max}}{(m - 1) b_{\min}a_{\min}} \bigg]
+\end{align}
+
+For $i \notin E_{\lf}$, we have that
+\begin{align}
+    \bar{a}_i - a_i \in \bigg[\frac{-d \varepsilon_{\max}}{(m - 1)(m - 2) b_{\min}^2 a_{\min}^2}, \; \frac{-d \varepsilon_{\min} b_{\min}^2}{(m - 1)(m - 2)} \bigg]
+\end{align}
+\end{lemma}
+
+\begin{proof}
+We define $\varepsilon_{ij} = \E{}{\lf_i \lf_j} - \E{}{\lf_i Y} \E{}{\lf_j Y}$ for $(i, j) \in E_{\lf}$, i.e. the error we get from assuming conditional independence between $\lf_i$ and $\lf_j$. We define the exact value of $\varepsilon_{ij}$ in Lemma \ref{lemma:varepsilon}, and since all canonical parameters are assumed to be positive, we know that there exist $\varepsilon_{\min}, \varepsilon_{\max}$ that satisfy $0 \le \varepsilon_{\min} \le \varepsilon_{ij} \le \varepsilon_{\max}$ over the entire edgeset $E_{\lf}$. We now propagate this error to $\bar{a}_i$. Define $\bar{a}_i^{(j, k)}$ before we take the expectation over triplets as
+\begin{align*}
+\bar{a}_i^{(j, k)} := \sqrt{\frac{\E{}{\lf_i \lf_j} \E{}{\lf_i \lf_k}}{\E{}{\lf_j \lf_k}}} 
+\end{align*}
+
+Note that this means $\bar{a}_i \ge b_{\min}$. When each $\E{}{\lf_i \lf_j}$ can be written as $\E{}{\lf_i Y} \E{}{\lf_j Y}$, we get that $\bar{a}_i^{(j, k)} = a_i$. However, by our assumptions on the edgeset, at most one of the above pairwise expectations has nonzero $\varepsilon_{ij}$, in which case the true $a_i$ is computed using $\E{}{\lf_i \lf_j} - \varepsilon_{ij}$, which is equal to $\E{}{\lf_i Y} \E{}{\lf_j Y}$, rather than $\E{}{\lf_i \lf_j}$.
+
+If $(i, j) \in E_{\lf}$ (but not $(j, k)$ or $(i, k)$) then
+\begin{align*}
+a_i = \sqrt{\frac{(\E{}{\lf_i \lf_j} - \varepsilon_{ij}) \E{}{\lf_i \lf_k}}{\E{}{\lf_j \lf_k}}}
+\end{align*}
+
+This means that $\bar{a}_i \ge a_i$ and we asymptotically overestimate the accuracy. Then the difference  between $\bar{a}_i^{(j,k) 2}$ and $a_i^2$ is
+$\bar{a}_i^{(j, k) 2} - a_i^2 = \frac{\varepsilon_{ij} \E{}{\lf_i \lf_k}}{\E{}{\lf_j \lf_k}} \in \big[\varepsilon_{\min} b_{\min}, \frac{\varepsilon_{\max}}{b_{\min}}\big]$. Moreover, $\bar{a}_i^{(j, k)} - a_i = \frac{\bar{a}_i^{(j, k) 2} - a_i^2}{\bar{a}_i^{(j, k)} + a_i}$. Since $\bar{a}_i \ge a_i$ in this case, we have that $\bar{a}_i^{(j, k)} + a_i \in [2a_{\min}, 2]$; as a result,
+\begin{align}
+\bar{a}_i^{(j, k)} - a_i \in \big[ \frac{\varepsilon_{\min} b_{\min}}{2}, \frac{\varepsilon_{\max}}{2 b_{\min} a_{\min}}\big] \label{eq:acc_diff_ij}
+\end{align}
+
+Similarly, if $(i,k) \in E_{\lf}$, we have the same bounds: $\bar{a}_i^{(j, k)2} - a_i^2 = \frac{\varepsilon_{ik} \E{}{\lf_i \lf_j}}{\E{}{\lf_j \lf_k}} \in \big[\varepsilon_{\min} b_{\min}, \frac{\varepsilon_{\max}}{b_{\min}}\big]$, and thus $\bar{a}_i^{(j, k)} - a_i \in \big[ \frac{\varepsilon_{\min} b_{\min}}{2}, \frac{\varepsilon_{\max}}{2 b_{\min} a_{\min}}\big]$. On the other hand, if $(j, k) \in E_{\lf}$, the true accuracy is written as
+\begin{align*}
+a_i = \sqrt{\frac{\E{}{\lf_i \lf_j} \E{}{\lf_i \lf_k}}{(\E{}{\lf_j \lf_k}- \varepsilon_{jk})} }
+\end{align*}
+
+This means that $\bar{a}_i^{(j, k)} \le a_i$ and we asymptotically underestimate the accuracy. The difference between $\bar{a}_i^{(j, k) 2}$ and $a_i^2$ is $a_i^2 - \bar{a}_i^{(j, k) 2}  = \frac{\varepsilon_{jk} \E{}{\lf_i \lf_j} \E{}{\lf_i \lf_k}}{\E{}{\lf_j \lf_k}(\E{}{\lf_j \lf_k} - \varepsilon_{jk})} \in \big[\varepsilon_{\min} b_{\min}^2, \frac{\varepsilon_{\max}}{b_{\min}a_{\min}^2} \big]$. In this case, $a_i + \bar{a}_i^{(j, k)} \in [2b_{\min}, 2]$, so 
+\begin{align}
+a_i - \bar{a}_i^{(j, k)} \in \Big[\frac{\varepsilon_{\min} b_{\min}^2}{2}, \frac{\varepsilon_{\max}}{2b_{\min}^2 a_{\min}^2} \Big]
+\label{eq:acc_diff_jk}
+\end{align}
+
+Lastly, if none of $i, j, k$ share edges, $\bar{a}_i = a_i$. In our algorithm, we estimate each $a_i$ using $\lf_j$ and $\lf_k$ chosen uniformly at random from the other $m - 1$ labeling functions. We thus need to compute the probabilities that $(i, j), (i, k)$ and $(j, k)$ are in $E_{\lf}$. Note that these probabilities depend on if $i \in E_{\lf}$, which is true for $2d$ labeling functions. 
+\begin{align}
+    &\Pr((i, j) \cup (i, k) \in E_{\lf} \; | \; i \notin E_{\lf}) = 0 \qquad \qquad \; \Pr((i, j) \cup (i, k) \in E_{\lf} \; | \; i \in E_{\lf}) = \frac{1(m - 2)}{{m - 1 \choose 2}} =  \frac{2}{m - 1} \nonumber \\
+    &\Pr((j, k) \in E_{\lf} \;| \; i \notin E_{\lf}) = \frac{2d}{(m - 1)(m - 2)}  \quad \Pr((j, k) \in E_{\lf} \;| \; i \in E_{\lf}) = \frac{2(d - 1)}{(m - 1)(m - 2)} \nonumber
+\end{align} 
+
+Therefore, if $i \in E_{\lf}$, we use \eqref{eq:acc_diff_ij} and \eqref{eq:acc_diff_jk} to bound the expected error as
+\begin{align*}
+\bar{a}_i - a_i &\le \frac{2}{m - 1} \cdot \frac{\varepsilon_{\max}}{2b_{\min} a_{\min}} + \frac{2(d - 1)}{(m - 1)(m - 2)} \cdot \frac{-\varepsilon_{\min} b_{\min}^2}{2} \le \frac{\varepsilon_{\max}}{(m - 1) b_{\min} a_{\min}} \\
+\bar{a}_i - a_i &\ge \frac{2}{m - 1} \cdot \frac{\varepsilon_{\min} b_{\min}}{2} + \frac{2(d - 1)}{(m - 1)(m - 2)} \cdot \frac{-\varepsilon_{\max}}{2 b_{\min}^2 a_{\min}^2} = \frac{\varepsilon_{\min} b_{\min}}{m - 1} - \frac{(d - 1)\varepsilon_{\max}}{(m - 1)(m - 2)b^2_{\min} a^2_{\min}}
+\end{align*}
+
+Note that this lower bound can be negative in this case, so it is not clear if $\bar{a}_i$ or $a_i$ is bigger in expectation. If $i \notin E_{\lf}$, using \eqref{eq:acc_diff_jk} then the expected error is bounded as
+\begin{align*}
+\bar{a}_i - a_i &\le \frac{2d}{(m - 1)(m - 2)} \cdot \frac{-\varepsilon_{\min} b_{\min}^2}{2} = \frac{-d\varepsilon_{\min} b_{\min}^2 }{(m - 1)(m - 2)}  \\
+\bar{a}_i - a_i &\ge \frac{2d}{(m - 1)(m - 2)}  \cdot \frac{-\varepsilon_{\max}}{2 b_{\min}^2 a_{\min}^2} = \frac{-d \varepsilon_{\max}}{(m - 1)(m - 2) b_{\min}^2 a_{\min}^2} 
+\end{align*}
+
+Note that in this case, $\bar{a}_i \le a_i$.
+
+\end{proof}
+
+
+
+
+
+\subsection{Proof of Proposition 1}
+
+
+\subsection{Proof of Corollary 1}
+
+
+

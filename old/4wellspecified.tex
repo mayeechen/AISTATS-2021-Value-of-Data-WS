@@ -1,0 +1,83 @@
+\section{Under Conditional Independence: Where Unlabeled Data is Enough}
+
+We now ask the question of whether a small number of labeled data points would significantly improve the noisy labels produced from their outputs. We begin by considering the case where the central assumption of data programming, that labeling functions are conditionally independently given the gold label, is met. Under this assumption, with at least three non-trivial \steve{what does non-trivial mean? footnote?} labeling functions and unlimited labeled data we show that the maximum likelihood estimates for accuracies and coverages converge to the true accuracies and coverages \bcw{TODO: Figure out whether we can cite Alex's paper for this, or need to adapt their proof}. In other words, with a sufficiently large unlabeled dataset nothing more can be learned about the labeling functions from gold labels. Since we can estimate labeling function accuracies and coverages perfectly with either unlimited unlabeled or labeled data, to understand the value of labeled data we examine the relative efficiency of labeled and unlabeled data points, which we formalize with the \textit{labeled data value ratio}. We provide the definition and discuss properties of the labeled data value ratio in Section \ref{sec:ldvr} and in Section \ref{sec:ldvr_varying} measure how it varies with different labeling function behaviors.
+
+\subsection{The labeled data value ratio}
+\label{sec:ldvr}
+
+Given a current number of unlabeled data points $n_U$, a current number of labeled data points $n_L$ and a target accuracy $a_\text{target}$, we define the \textit{labeled data value ratio} to be the ratio $r\in\mathbb{R}$ of additional unlabeled to labeled points needed to attain an accuracy of $a_\text{target}$. Formally, let
+\begin{align}
+    \Delta n_\text{unlabeled}(n_U,n_L,a_\text{target})&=\min\{\Delta n:A(n_U+\Delta n,n_L)\geq a_\text{target}\}\\
+    \Delta n_\text{labeled}(n_U,n_L,a_\text{target})&=\min\{\Delta n:A(n_U,n_L+\Delta n)\geq a_\text{target}\}
+\end{align}
+where $A(n_U,n_L)$ is the expected accuracy of a model trained on $n_U$ unlabeled and $n_L$ labeled data points sampled from our data distribution. Then the labeled data value ratio is simply
+\begin{equation}
+    r(n_U,n_L,a_\text{target})=\frac{\Delta n_\text{unlabeled}(n_U,n_L,a_\text{target})}{\Delta n_\text{labeled}(n_U,n_L,a_\text{target})}
+\end{equation}
+
+\subsubsection{The labeled data value ratio does not depend on $n_U,n_L$ or $a_\text{target}$}
+
+Surprisingly, empirical evidence suggests that the labeled data value ratio does not depend on $n_U,n_L$ or $a_\text{target}$. In other words, it is a property of the data distribution and labeling functions. In \autoref{fig:ldvr_property} we report the expected accuracy (averaged over $200$ trials) of our model with $\gamma=1$ for different numbers of labeled and unlabeled point on a synthetic dataset with balanced classes and $20$ unipolar conditionally independent labeling functions ($10$ for each class) with accuracies chosen uniformly from $[.5,.9]$ and coverages chosen uniformly from $[.05,.15]$. We notice that the expected accuracy is roughly the same where $n_U+r\cdot n_L$ is constant. This suggests that $A(n_U,n_L)\approx f(n_U+r\cdot n_L)$ for some function $f$, which means that increasing $n_L$ by $\Delta n$ and increasing $n_U$ by $r\Delta n$ always result in the same expected increase in accuracy.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=.5\textwidth]{figures/ldvr_accuracy_plot.pdf}
+    \caption{We see that the expected accuracy is roughly the same where $\#\text{Unlabeled Points}+r\cdot\#\text{Labeled Points}$ is constant. This suggest that the labeled data value ratio (which is roughly $3.36$ here) is a property of the data distribution and labeling functions.}
+    \label{fig:ldvr_property}
+\end{figure}
+
+\subsection{Varying accuracy, coverage, and the number of labeling functions}
+\label{sec:ldvr_varying}
+
+With the labeled data value ratio depending only on our data distribution and labeling functions, we seek to understand how it changes with different properties of the labeling functions, particularly the number of labeling functions, their accuracies, and their coverages. With mean accuracy $\alpha_\text{mean}=.75$, mean coverage $\beta_\text{mean}=.15$ and $m=20$ labeling functions as ``standard'' parameter values, we vary one parameter at a time and observe how the expected labeled data value ratio changes. We summarize the results in \autoref{fig:varying_variables}. Generally, it appears that the labeled data value ratio decreases with more labeling functions, with more accurate labeling functions and with higher coverage labeling functions. Notably, we see that for reasonable data distributions and labeling functions the labeled data value ratio is less than $5$. This means that each gold labeled data point is worth no more than $5$ additional unlabeled data points. Considering the abundance of unlabeled data in most applications, the value of any small number of labeled data points is quite limited in this setting.
+
+\begin{figure}
+\centering
+\begin{subfigure}{.32\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{figures/accuracy_labeled_data_value_ratio.pdf}
+  \caption{Varying accuracy}
+  \label{fig:varying_accuracy}
+\end{subfigure}%
+\begin{subfigure}{.32\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{figures/coverage_labeled_data_value_ratio.pdf}
+  \caption{Varying coverage}
+  \label{fig:varying_coverage}
+\end{subfigure}
+\begin{subfigure}{.32\textwidth}
+  \centering
+  \includegraphics[width=\linewidth]{figures/labeling_functions_labeled_data_value_ratio.pdf}
+  \caption{Varying \# of labeling functions}
+  \label{fig:varying_lfs}
+\end{subfigure}
+\caption{The labeled data value ratio as we vary accuracy, coverage and the number of labeling functions.}
+\label{fig:varying_variables}
+\end{figure}
+
+\subsubsection{Producing synthetic datasets}
+
+We produce synthetic datasets in which labeling functions are conditionally independent given the gold label as follows. Given mean accuracy $\alpha_\text{mean}$, mean coverage $\beta_\text{mean}$ and the number of labeling functions $m$ (with $m$ always even), we draw the $m$ labeling function accuracies uniformly from $[\alpha_\text{mean}-0.1,\alpha_\text{mean}+0.1]$ and the $m$ labeling function coverages uniformly from $[\beta_\text{mean}-0.05,\beta_\text{mean}+0.05]$. We let the first $m/2$ labeling functions be unipolar with positive class and the last $m/2$ labeling functions be unipolar with negative class (it is reasonable to include only unipolar labeling functions because our approach separates every bipolar labeling function into two unipolar ones). For each data point, we draw the gold label uniformly from $\{-1,1\}$ and independently draw the output of each labeling function according to its class, accuracy and coverage.
+
+\subsubsection{Computing the labeled data value ratio}
+
+To compute the labeled data value ratio for parameters $\alpha_\text{mean},\beta_\text{mean}$ and $m$ we compute the expected accuracy of a model with $\gamma=1$ for different number of unlabeled data points and different numbers of labeled data points, and estimate $\hat{r}$ to minimize the $\ell_1$ difference between the accuracy with $n$ labeled data points and $\hat{r}\cdot n$ unlabeled data points for different values of $n$. We illustrate this process in \autoref{fig:ldvr_computation} and provide more details in Section \ref{appendix:ldvr_computation} of the appendix.
+
+\begin{figure}
+\centering
+\begin{subfigure}{.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{figures/ldvr_computation_example.pdf}
+  \caption{Accuracy for different budgets, where the units of budget are $1$ data point (whether labeled or unlabeled).}
+  \label{fig:ldvr_computation_before}
+\end{subfigure}
+\hspace{5mm}
+\begin{subfigure}{.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{figures/ldvr_computation_example_scaled.pdf}
+  \caption{Accuracy for different budgets, where the units of budget are $1$ labeled data point or $\hat{r}$ unlabeled data points.}
+  \label{fig:ldvr_computation_after}
+\end{subfigure}
+\caption{An illustration of our method for computing the labeled data value ratio. We estimate the labeled data value ratio to be the value $\hat{r}$ such that the $\ell_1$ difference between the accuracies with $n$ labeled data points and the accuracies with $\hat{r}\cdot n$ unlabeled data points is minimized.}
+\label{fig:ldvr_computation}
+\end{figure}

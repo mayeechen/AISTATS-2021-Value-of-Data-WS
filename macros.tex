@@ -1,0 +1,95 @@
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{xcolor}
+%\usepackage[colorinlistoftodos]{todonotes}
+%\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+%\usepackage{accents}
+\usepackage{wrapfig}
+\usepackage[thinlines]{easytable}
+\usepackage{titlesec}
+\usepackage{subcaption}
+\usepackage{mathtools}
+\usepackage{bold-extra}
+\usepackage{bm}
+\usepackage{booktabs}
+
+\newcommand{\ubar}[1]{\underaccent{\bar}{#1}}
+  
+\newcommand{\steve}[1]{{\color{magenta} { [Steve: #1]}}}
+\newcommand{\bcw}[1]{{\color{orange} { [Ben: #1]}}}
+\newcommand{\mayee}[1]{{\color{green} { [Mayee: #1]}}}
+\newcommand{\chris}[1]{\textcolor{red}{[Chris: #1]}}
+\newcommand{\todo}[1]{{\color{red} {[TODO: #1]}}}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{observation}{Observation}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{assumption}{Assumption}
+
+%% OPERATORS:
+\newcommand{\norm}[1]{\left|\left|#1\right|\right|}
+\newcommand{\argmin}[2]{\textrm{argmin}_{#1}~#2}
+\newcommand{\argmax}[2]{\textrm{argmax}_{#1}~#2}
+% Inner product
+\newcommand{\ip}[2]{\left\langle#1, #2\right\rangle}
+% Trace
+\newcommand{\tr}{\textrm{tr}}
+% Expected value
+\newcommand{\E}[2]{\mathbb{E}_{#1}\left[#2\right]}
+% Sample mean
+\newcommand{\Ehat}[1]{\hat{\mathbb{E}}\left[#1\right]}
+% Variance
+\newcommand{\Var}[2]{\mathrm{Var}_{#1}\left(#2\right)}
+% Covariance
+%\newcommand{\Cov}[2]{\textrm{\textbf{Cov}}_{#1}\left[#2\right]}
+% Indicator
+\newcommand{\ind}[1]{\mathbbm{1}\left\{#1\right\}}
+\newcommand{\indpm}[1]{\mathbbm{1}^{\pm}\left\{#1\right\}}
+% sech
+\newcommand{\sech}[0]{\textrm{sech}}
+% diag
+\newcommand{\diagm}[1]{\textrm{diagm}\left(#1\right)}
+% supp
+\newcommand{\supp}{\text{supp}}
+% independent
+\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+
+
+\newcommand{\Eprime}[2]{\mathbb{E}'_{#1}\left[#2\right]}
+\newcommand{\Etilde}[2]{\widetilde{\mathbb{E}}_{#1}\left[#2\right]}
+
+\newcommand{\Ptilde}[0]{\widetilde{\Pr}}
+\newcommand{\Pbar}[0]{\overline{\Pr}}
+\newcommand{\Phat}[0]{\hat{\Pr}}
+
+
+\newcommand{\T}[0]{\mathcal{T}}
+
+
+
+
+
+%% VARIABLES:
+% See Glossary of Symbols (Appendix A.1)
+\newcommand{\x}[0]{X}
+\newcommand{\p}[0]{\mathcal{P}}
+\newcommand{\y}[0]{Y}
+\newcommand{\lf}[0]{\lambda}
+\newcommand{\lfc}[0]{\Lambda}
+\newcommand{\acc}[0]{\alpha}
+\newcommand{\X}[0]{\mathcal{X}}
+\newcommand{\D}[0]{\mathcal{D}}
+\newcommand{\N}[0]{\mathcal{N}}

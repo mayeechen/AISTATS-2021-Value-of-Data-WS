@@ -1,0 +1,10 @@
+% \section{Discussion and Related Work}
+
+% In this exploration, we find that a small number of gold labels can be valuable within the data programming pipeline, suggesting that expert time might be best spent on a combination of providing high-level intuitions through labeling functions and individual gold labels. Alternate approaches for using a small number of gold labels remain to be studied. For example, instead of learning accuracies from gold labels, these labels could be used for semi-supervised training along with the noisy labels produced by the standard data programming process. 
+
+% Co-training, proposed by \cite{blum1998combining}, 
+
+% \cite{nashaat2018hybridization} propose hybridizing data programming with active learning by selecting data points to label where labeling functions disagree most, and ``correcting'' labeling functions on these examples. Our work differs from this approach in that we study how gold labels for a small numbers of randomly selected examples can be valuable, whereas they propose budgets in the thousands which can be actively selected.
+
+% One limitation of our work is that the unlabeled weight parameter $\gamma$ must be tuned using validation data, as its optimal value depends on the number of data points available and the data distribution. Our experiments seem to indicate that smaller values of $\gamma$ perform better when the dependencies between labeling functions are more pronounced. For example, when conditional independence assumptions are met we find empirically that $\gamma=1$ is optimal but when dependencies exist (including on real datasets) the optimal value of $\gamma$ is much smaller. We leave it to future work to determine a more effective policy for selecting $\gamma$ that does not require additional validation data.
+

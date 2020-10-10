@@ -1,0 +1,37 @@
+\section{Glossary}
+\label{sec:gloss}
+
+The glossary is given in Table~\ref{table:glossary} below.
+\begin{table*}[h]
+\centering
+\small
+\begin{tabular}{l l}
+\toprule
+Symbol & Used for \\
+\midrule
+$X$ & Unlabeled data vector, $X = [X^1, X^2, \ldots, X^T] \in \mathcal{X}$. \\
+%$X_i$ & $i$th unlabeled data vector \\
+%$X_i$ & $i$th data element  \\
+%$T$ & Length of the unlabeled data vector \\
+%$\mathcal{T}$ & Task indices \\
+$Y$ & Latent, ground-truth task label vector $[Y^1, Y^2, \ldots, Y^T] \in \mathcal{Y} = \{-1, +1\}$.  \\
+%$\bm{Y}^i$ & $i$th ground-truth label vector \\
+%$Y_i$ & Ground-truth label for $i$th task, $Y_i \in \{-1, +1\}$  \\
+%$r$ & Resolution level. $r=1$ refers to resolution level in which each of the $T$ elements is labeled\\
+$\mathcal{D}$ & Distribution from which $(X, Y)$ data points are sampled i.i.d. \\
+%$S_i$ & $i$th weak supervision source\\
+$m$ & Number of weak supervision labeling functions. \\
+$\lf_i$ & Labeling function $\lf_i: \mathcal{X} \rightarrow \mathcal{Y} \cup \{0\}$; all $m$ labels per $X$ collectively denoted $\bm{\lf}$. \\
+$D$ & Unlabeled dataset $\{X_i\}_{i = 1}^n$ that $\bm{\lf}$ is applied to in order to produce labels. \\
+$n$ & Number of data vectors. \\
+$a_i$ & Accuracy of original labeling function $\Pr(\lf_i = Y | \lf_i \neq 0)$. \\
+$\bar{a}_i$ & Accuracy of extended labeling function $\Pr(\bar{\lf}_i = Y | \bar{\lf}_i \neq 0)$. \\
+\toprule
+\end{tabular}
+\caption{
+	Glossary of variables and symbols used in this paper.
+}
+\label{table:glossary}
+\end{table*}
+
+
