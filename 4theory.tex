@@ -4,7 +4,7 @@ We theoretically analyze the quality of weak supervision's label model, taking i
 %Then, we propagate this error into our computation of the 
 In \ref{subsec:decomp} we give 
 %bounds the accuracy estimation error that arises from using unlabeled data under misspecification. Next, we use these to present
-an exact decomposition of the generalization error of the label model, which demonstrates how misspecification is present in both the learning and aggregation steps of the model when data is weakly labeled and only present in the latter when data is fully labeled. In \ref{subsec:scaling}, we bound the generalization error using this framework to show how the weakly labeled case has an additional standing bias of $\mathcal{O}(d/m)$. Given this standing bias, in \ref{sec:misspec}, we introduce a simple method that under certain conditions can correct for dependency-based misspecification. We then analyze this correction's impact on generalization error. 
+an exact decomposition of the generalization error of the label model, which demonstrates how misspecification is present in both the learning and aggregation steps of the model when data is weakly labeled and only present in the latter when data is fully labeled. In \ref{subsec:scaling}, we bound the generalization error using this framework to show how the weakly labeled case has an additional standing bias of $\mathcal{O}(d/m)$. Given this standing bias, in \ref{sec:misspec}, we introduce a simple method that under certain conditions can correct for dependency-based misspecification. We analyze this correction's impact on generalization error. 
 
 
 
@@ -38,7 +38,7 @@ an exact decomposition of the generalization error of the label model, which dem
 
 %The estimation error for $\widetilde{a}_i^U$ is now propagated into the generalization error for the label model. We define the generalization error as $\mathbb{E}[l(\widetilde{Y}, Y)]$, where \[l(\widetilde{y}_i, y_i) = -\left(\frac{1 + y_i}{2}\right) \log \widetilde{\Pr}(Y = 1 | \lf = \lf(x_i)) - \left(\frac{1 - y_i}{2}\right) \log \widetilde{\Pr}(Y = -1 | \lf = \lf(x_i))\] is the cross-entropy loss. The expectation is taken over $(Y, \bm{\lf})$, the random triplets chosen to estimate each $a_i$, and the finite samples used. 
 
-We present our first result, a decomposition of weak supervision's generalization error into four components. The last two components, the inference bias and parameter estimation error, reflect the role of misspecification.
+Our first result is a decomposition of the generalization error into four components. The last two components, the inference bias and parameter estimation error, reflect the role of misspecification.
 \begin{theorem}
 The generalization error has the following decomposition:
 \begin{align}
@@ -53,14 +53,16 @@ where $I(\lf_i; \lf_j | Y)$ is the conditional mutual information between labeli
 
 We now discuss the significance of each term in this decomposition. The first two terms are independent of misspecification and are present in both the weakly and fully labeled cases:
 \begin{itemize}
-    \item Irreducible error: this term is an intrinsic property of the distribution of $(Y, \bm{\lf})$ and is always present in bias-variance decomposition. Here, it roughly measures the quality of the labeling functions.
+  \setlength\itemsep{0em}
+    \item Irreducible error: an intrinsic property of the distribution of $(Y, \bm{\lf})$ always present in bias-variance decomposition. Here, it roughly measures the quality of the labeling functions.
     \item %\steve{I'm confused by the negative sign in front of this term.} 
-    Observable sampling noise: particular to our inference approach, this term is the expected Kullback-Leibler divergence between the true marginal distribution of the observable labeling functions and the empirical distribution. It is a common notion of sampling noise~\citep{domingos2000unified, yang2020rethinking} and approaches $0$ asymptotically.
+    Observable sampling noise: particular to our inference approach, this term is the expected KL divergence between the true marginal distribution of the observable labeling functions and the empirical distribution. It is a common notion of sampling noise~\citep{domingos2000unified, yang2020rethinking} and approaches $0$ asymptotically.
 \end{itemize}
 
 For the last two terms, misspecification plays a different role depending on the data type. 
 \begin{itemize}
-    \item Inference bias: this term is the conditional mutual information between conditionally dependent labeling functions. Particular to our inference approach, it describes the approximation error of using marginal probabilities of singletons rather than their product distributions. Therefore, it represents the role of misspecification at the aggregation step in \eqref{eq:inference} and is present for both data types. It is independent of parameter estimation method.
+  \setlength\itemsep{0em}
+    \item Inference bias: this term is the conditional mutual information between conditionally dependent sources. Particular to our inference approach, it is the approximation error of using marginal probabilities of singletons rather than their product distributions. Therefore, it represents the role of misspecification at the aggregation step in \eqref{eq:inference} and is present for both data types. It is independent of parameter estimation method.
     \item Parameter estimation error: this term describes the difference between the true distribution of $\lf_i$ conditional on $Y$ versus the estimated distribution. As discussed in section \ref{sec:background}, this directly depends on accuracy parameter estimation approach for $\widetilde{a}_i$. In the labeled data case, we know that this error corresponds to sampling noise and thus asymptotically approaches $0$. For the weakly labeled case, in addition to sampling noise the estimator in \eqref{eq:triplet} is also biased, as are many method-of-moments approaches. Furthermore, misspecification impacts the learning step of the WS label model and makes the estimator inconsistent when $\lf_i, \lf_j,$ and $\lf_k$ used to produce $\widetilde{a}_i^U$ are not pairwise conditionally independent.
 \end{itemize}
 
@@ -144,17 +146,16 @@ Note that while we assume sparsity of $E_{\lf}$ for simpler analysis in section 
 
 \subsection{Synthetic Experiments}
 
-We validate the fundamental principles of our theoretical framework using synthetic data. We measure the excess generalization error vs. $\log(n)$ in the well-specified, misspecified and corrected settings on synthetic data with $m=10$ labeling functions, accuracies drawn uniformly from $[.55, .75]$ and extents of misspecification fixed at $\varepsilon=0.1$. A more detailed protocol for synthetic experiments is available in the \todo{Appendix}.
+We validate the fundamental principles of our theoretical framework using synthetic data. We measure the excess generalization error vs. $\log(n)$ in the well-specified, misspecified and corrected settings on synthetic data with $m=10$ labeling functions, accuracies drawn uniformly from $[.55, .75]$ and extents of misspecification fixed at $\varepsilon=0.1$. A more detailed protocol for synthetic experiments is available in the Appendix.
 %First, in the labeled and unlabeled settings, a well-specified model achieves an asymptotic error of zero. Under misspecification, we see the presence of $\B_I$ in both settings, and an additional parameter estimation bias $\B_{\mathrm{est}}$ in the unlabeled setting. Finally, we expect a corrected model to mitigate this parameter estimation bias. 
 %We report how our empirical results match up with theory in \autoref{fig:gen_err}. 
 Our results are in \autoref{fig:gen_err}. With no misspecification ($d=0$) the labeled and unlabeled estimators both tend towards zero. Under misspecification ($d=5$), we see that learning from unlabeled data results in an additional standing bias that parallels $\B_{\mathrm{est}}$. Median aggregation reduces this bias and results in error converging to roughly similar values, paralleling $\B_I$, in both the weakly-labeled and labeled cases.
 
-%%%% UNCOMMENT
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=.48\textwidth]{figures/biases.png}
-%     %
-%     \caption{Excess generalization error vs. $\log(n)$ with different estimators for synthetic data. Left: comparison of unlabeled data performance under the three discussed settings. Right: comparison of labeled data performance for well-specified and misspecified models. A dashed line repesenting an empirical ``$\B_I$'' suggests how inference bias is present in both data cases.  % With no misspecification ($d=0$) the labeled and unlabeled estimators both converge to an asymptotic error of zero. Under misspecification ($d=5$), we see that learning from unlabeled data results in an additional $\B_{\mathrm{est}}$ standing bias due to misspecification, and median aggregation corrects for this bias so that error converges to $\B_I$.
-%     }
-%     \label{fig:gen_err}
-% \end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=.48\textwidth]{eps_figures/biases.eps}
+    %
+    \caption{Excess generalization error vs. $\log(n)$ with different estimators for synthetic data. Left: comparison of unlabeled data performance under the three discussed settings. Right: comparison of labeled data performance for well-specified and misspecified models. A dashed line repesenting an empirical ``$\B_I$'' suggests how inference bias is present in both data cases.  % With no misspecification ($d=0$) the labeled and unlabeled estimators both converge to an asymptotic error of zero. Under misspecification ($d=5$), we see that learning from unlabeled data results in an additional $\B_{\mathrm{est}}$ standing bias due to misspecification, and median aggregation corrects for this bias so that error converges to $\B_I$.
+    }
+    \label{fig:gen_err}
+\end{figure}

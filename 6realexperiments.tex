@@ -22,7 +22,9 @@ We validate our findings on a real-world dataset. We expect that some amount of 
     \item Can a combined estimator with access to a small amount of labeled data provide substantial benefits over using only unlabeled data?
 \end{itemize}
 
-\paragraph{Protocol} Our real-world task is the sentiment analysis task of determining whether IMDB movie reviews are positive or negative \citep{maas2011learning}. The dataset contains 50K movie reviews, which we split into a training set of 35K reviews and validation and test sets of 7.5K reviews each. For our weak supervision sources, we use the following simple heuristics: For each word \steve{how did you pick the words? Especially the negative ones seem a little counterintuitive.} \bcw{I sorted words according to predictive power, and picked ones which seemed intuitive. I'm guessing you're referring to ``better'', ``could'' and ``would'' when you talk about the counterintuitive ones. These actually make sense to me, as they're referring to things like ``could have been better''} \steve{Can you add a few words describing the process then? Maybe: ``we chose words that were predictive and intuitive'' or something like that} of ``love'', ``like'', ``good'', ``great'', ``best'', ``excellent'' we write a labeling function which votes positive when the word appears, and negative otherwise. For each word of ``terrible'', ``worst'', ``bad'', ``better'', ``could'', ``would'' we similarly write a labeling function which votes negative when the word appears, and positive otherwise.
+\paragraph{Protocol} Our real-world task is the sentiment analysis task of determining whether IMDB movie reviews are positive or negative \citep{maas2011learning}. The dataset contains 50K movie reviews, which we split into a training set of 35K reviews and validation and test sets of 7.5K reviews each. For our weak supervision sources, we use the following simple heuristics: For each word  of ``love'', ``like'', ``good'', ``great'', ``best'', ``excellent'' we write a labeling function which votes positive when the word appears, and negative otherwise. For each word of ``terrible'', ``worst'', ``bad'', ``better'', ``could'', ``would'' we similarly write a labeling function which votes negative when the word appears, and positive otherwise. We use these words because they are empirically predictive and intuitively associated with positive/negative reviews.
+
+% \steve{how did you pick the words? Especially the negative ones seem a little counterintuitive.} \bcw{I sorted words according to predictive power, and picked ones which seemed intuitive. I'm guessing you're referring to ``better'', ``could'' and ``would'' when you talk about the counterintuitive ones. These actually make sense to me, as they're referring to things like ``could have been better''} \steve{Can you add a few words describing the process then? Maybe: ``we chose words that were predictive and intuitive'' or something like that}
 
 \todo{Talk about singleton potentials}. As a proxy for generalization error in our experiments, we use the cross entropy loss on a test set.
 % We measure model performance in terms of its F1-score on the test set as a proxy for generalization error.
@@ -30,69 +32,64 @@ We validate our findings on a real-world dataset. We expect that some amount of 
 
 \paragraph{Standing bias and correction}
 
-In our first real-world experiment, we measure the standing parameter estimation bias when learning from unlabeled data $\mathcal{B}_\text{est}$, and measure the decrease in this bias when using a corrected estimator. Recall that a corrected estimator has an asymptotic parameter estimation bias of zero when $d<\frac{(m-1)(m-2)}{4}$ for reasonable values of $m$ and $n$. In this real-world setting, we anticipate many small dependencies; $d$ might even be $m \choose 2$ but with most $\varepsilon_{ij}$ quite small. Hence, we anticipate that the corrected estimator reduces $\mathcal{B}_\text{est}$ by mitigating the effects of larger dependencies while still being biased by the many small dependencies. We measure 
+For our first real-world experiment, we measure the standing parameter estimation bias when learning from unlabeled data $\mathcal{B}_\text{est}$, and measure the decrease in this bias when using a corrected estimator. Recall that a corrected estimator has an asymptotic parameter estimation bias of zero when $d<\frac{(m-1)(m-2)}{4}$ for reasonable values of $m$ and $n$. In this real-world setting, we anticipate many small dependencies; $d$ might even be $m \choose 2$ but with most $\varepsilon_{ij}$ quite small. Hence, we anticipate that the corrected estimator reduces $\mathcal{B}_\text{est}$ by mitigating the effects of larger dependencies while still being biased by the many small dependencies. We compute the test cross entropy loss for a labeled model, a baseline unlabeled and an unlabeled model with correction while varying $n$ and report results in \autoref{fig:real_biases}. Losses appear to converge, with a large gap between the labeled and unlabeled models and a smaller gap between the labeled model and the unlabeled model with correction.
 
-We first measure $\mathcal{B}_\text{est}$, the standing parameter estimation bias when learning from unlabeled data, by computing the difference between the baseline triplet method and a labeled estimator over the entire training set. \todo{Finish writing, add table}.
+\begin{figure}
+    \centering
+    \begin{subfigure}{.25\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{eps_figures/real_biases.eps}
+     % \caption{A subfigure}
+     % \label{fig:sub1}
+    \end{subfigure}
+   %
+    \begin{subfigure}{.4\textwidth}
+      \centering
+      \begin{small}
+      \begin{tabular}{lccr}
+      \hline
+      \vskip -0.1in
+      Model & $\text{Loss}_\text{40K}$ & $\text{F1}_\text{40K}$ \\
+      \hline
+      Labeled & .570 & 71.79 \\
+      Unlabeled & .740 & 64.81 \\
+      Corrected & .686 & 68.12 \\
+      \hline
+      \end{tabular}
+      \end{small}
+     % \caption{A subfigure}
+     % \label{fig:sub1}
+    \end{subfigure}
+    \caption{}
+    \label{fig:real_biases}
+\end{figure}
 
-%%%% UNCOMMENT
-% \begin{figure}
-%     \centering
-%     \begin{subfigure}{.25\textwidth}
-%       \centering
-%       \includegraphics[width=\linewidth]{figures/real_biases.png}
-%       % \caption{A subfigure}
-%       % \label{fig:sub1}
-%     \end{subfigure}
-%     %
-%     \begin{subfigure}{.4\textwidth}
-%       \centering
-%       \begin{small}
-%       \begin{tabular}{lccr}
-%       \hline
-%       \vskip -0.1in
-%       Model & $\text{Loss}_\text{40K}$ & $\text{F1}_\text{40K}$ \\
-%       \hline
-%       Labeled & .570 & 71.79 \\
-%       Unlabeled & .740 & 64.81 \\
-%       Corrected & .686 & 68.12 \\
-%       \hline
-%       \end{tabular}
-%       \end{small}
-%       % \caption{A subfigure}
-%       % \label{fig:sub1}
-%     \end{subfigure}
-%     \caption{}
-%     \label{fig:real_biases}
-% \end{figure}
+\paragraph{Measuring the value of labeled data} Next, we measure the data value ratio in the real-world setting. Since both the unlabeled model and the unlabeled model with correction have a standing bias compared to the labeled model, we anticipate that the data value ratio for both unlabeled approaches grows with $n$, with the data value ratio for the baseline unlabeled model growing faster due to its higher bias. We report these results in \autoref{fig:real_data_value_ratio}.
 
-\paragraph{Measuring the value of labeled data}
-\todo{Finish writing, add table/plot}.
+\begin{figure}
+    \centering
+    \includegraphics[width=.4\textwidth]{eps_figures/real_data_value_ratio.eps}
+   %
+    \caption{}
+    \label{fig:real_data_value_ratio}
+\end{figure}
 
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=.4\textwidth]{figures/real_data_value_ratio.png}
-%     %
-%     \caption{}
-%     \label{fig:real_data_value_ratio}
-% \end{figure}
-
-\paragraph{Combining labeled and unlabeled data}
-\todo{Finish writing, add reference to table}.
+\paragraph{Combining labeled and unlabeled data} We finally measure the performance of the combined estimator from \cite{GreenStrawderman2001} in the setting where a small number of labeled points and many unlabeled points are available. We let $n_U=40,000$ be the entire training set and vary $n_L$ between $40$ and $400$. We use the more performant corrected estimator for learning from unlabeled data. We report the F1 score, which is typically used to measure the performance of weak supervision methods. Results are in \autoref{tab:real_combo}. We observe that the combined estimator outperforms either approach individually for $n_L>40$.
 
 % We use three tasks. First, \textbf{Spam} classification for Youtube comments ~\citep{alberto2015tubespam} has $10$ LFs from~\cite{Ratner19}. Here, the training set has $1586$ examples and the test set has $250$ examples; classes are approximately balanced. 
 
 % In this case, we do not a priori know the level of misspecification. We expect that LFs are neither completely conditionally independent nor so markedly (conditionally) dependent that nothing can be learned from unlabeled data. This leads to data value ratios that are in between the scenarios in between the two extreme synthetic cases we considered above.
 
 \begin{table}[t]
-\caption{F1-scores for unlabeled, labeled and combined approaches for the IMDB dataset. We observe that the number of labeled data points needed to match the performance of learning from the entire unlabeled dataset is relatively small and that a combined estimator generally outperforms either approach individually. \todo{add end model results}}
-\label{sample-table}
+\caption{F1-scores for unlabeled, labeled and combined approaches on the IMDB dataset. }
+\label{tab:real_combo}
 \vskip 0.15in
 \renewcommand{\arraystretch}{1.25} % Default value: 1
 \begin{center}
 \begin{small}
 \begin{tabular}{lccccr}
 \hline
-$n_U$ & $n_L$ & $\bf{F1}_U$ & $\bf{F1}_L$ &  $\bf{F1}_C$ \\
+$n_U$ & $n_L$ & $\text{F1}_\text{Unlabeled}$ & $\text{F1}_\text{Labeled}$ &  $\text{F1}_\text{Combined}$ \\
 \hline
 40,000 & 40 & 68.12 & 64.70 & 67.06 \\
 40,000 & 80 & 68.12 & 67.65 & 68.81 \\

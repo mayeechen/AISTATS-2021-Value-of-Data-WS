@@ -11,34 +11,33 @@ Based on our generalization error framework, we now have a rigorous way to analy
 
 
 \subsection{Understanding the value of labeled data}
-We use our analysis from section \ref{subsec:scaling} to develop a criterion for deciding between $n_L$ labeled points and $n_U$ weakly labeled points. Let $n = n_U$, and then compute
-\[\alpha(n) = \min_{n_L \in \mathbb{N}} \text{ s. t. } R_L^{\mathrm{excess}}(n_L) \le R_U^{\mathrm{excess}}(n),\]
+We use our analysis from section \ref{subsec:scaling} to develop a criterion for deciding between $n_L$ labeled points and $n_U$ weakly labeled points. Compute
+\[\alpha(n_U) = \min_{n_L \in \mathbb{N}} \text{ s. t. } R_L^{\mathrm{excess}}(n_L) \le R_U^{\mathrm{excess}}(n_U),\]
 %where $U^{\text{unlabeled}}, U^{\text{labeled}}$ are the upper bounds on the excess generalization error for unlabeled and labeled data, respectively.
-\steve{can we replace $n$ with $n_U$ in the equation above and this section? I think that would be clearer} \bcw{+1}
+and define
 %\begin{align}
-$V(n) = {n}/\alpha(n)$
+$V(n_U) = {n_U}/\alpha(n_U)$
 %\end{align}
-represents the value of labeled over weakly labeled data. The intuitive idea here is to compare, for each amount of weakly labeled data $n_U$, what factor less labeled data we would require to produce an equivalent error bound. We consider an approximation of the data value ratio $\widetilde{V}(n)$ based on our upper bounds for $R_U$ and $R_L$ in Theorems \ref{thm:labeled} and \ref{thm:unlabeled}. We examine the differences in $\widetilde{V}(n)$ for our three aforementioned settings:
+to be the \textit{data value ratio}. The intuitive idea here is to compare, for each amount of weakly labeled data $n_U$, what factor less labeled data we would require to produce an equivalent error bound. We consider an approximation of the data value ratio $\widetilde{V}(n_U)$ based on our upper bounds for $R_U$ and $R_L$ in Theorems \ref{thm:labeled} and \ref{thm:unlabeled}. We examine the differences in $\widetilde{V}(n_U)$ for our three aforementioned settings:
 \begin{itemize}
-    \item Well-specified setting: comparing excess risk when $d = 0$ and $\varepsilon_{\max} = 0$ reduces to examining $\frac{m}{2n_L}$ and $\frac{c_4 m}{n_U}$. Thus $\widetilde{V}(n) = 2c_4$ and our framework suggests that labeled data is only a constant factor more beneficial than weakly labeled data.
-    \item Misspecified setting: $V(n)$ in this case will capture the tradeoff between $\frac{m}{2n_L}$ and $\B_{\mathrm{est}} + \frac{c_4 m }{n_U}$. We find that $\widetilde{V}(n) = 2 \varepsilon_{\max} \left(\frac{c_1 dn}{m} + \frac{c_2 \sqrt{n}}{m} + +\frac{c_3 d}{m^2} \right) + 2 c_4$. That is, the value of labeled data \textit{increases linearly in the amount of unlabeled data and misspecification} due to the standing bias in the generalization error for the weakly labeled data case.  
+    \item Well-specified setting: comparing excess risk when $d = 0$ and $\varepsilon_{\max} = 0$ reduces to examining $\frac{m}{2n_L}$ and $\frac{c_4 m}{n_U}$. Thus $\widetilde{V}(n_U) = 2c_4$ and our framework suggests that labeled data is only a constant factor more beneficial than weakly labeled data.
+    \item Misspecified setting: $V(n_U)$ in this case will capture the tradeoff between $\frac{m}{2n_L}$ and $\B_{\mathrm{est}} + \frac{c_4 m }{n_U}$. We find that $\widetilde{V}(n_U) = 2 \varepsilon_{\max} \left(\frac{c_1 dn_U}{m} + \frac{c_2 \sqrt{n_U}}{m} + +\frac{c_3 d}{m^2} \right) + 2 c_4$. That is, the value of labeled data \textit{increases linearly in the amount of unlabeled data and misspecification} due to the standing bias in the generalization error for the weakly labeled data case.  
     \item Corrected setting: under our conditions from Proposition \ref{prop:medians}, we examine the difference between $\frac{m}{2n_L}$ and $ c_\rho m \rho_{n_
-    U}$, and thus $\widetilde{V}(n) = 2nc_{\rho} \rho_n$. Since $\rho_n$ converges to $0$, $V(n)$ is sublinear in $n$, showing that the \textit{corrected model reduces the value of labeled data.}
+    U}$, and thus $\widetilde{V}(n_U) = 2n_U c_{\rho} \rho_{n_U}$. Since $\rho_{n_U}$ converges to $0$, $\widetilde{V}(n_U)$ is sublinear in $n_U$, showing that the \textit{corrected model reduces the value of labeled data.}
 \end{itemize}
 
 \paragraph{Synthetic Experiments} We measure $V(n)$ in well-specified, misspecified and corrected settings on synthetic data with the same setup as previously discussed. 
 %We expect three principles to hold: first, for a well-specified model, the data value ratio is small and roughly constant, second, the ratio scales with misspecification and finally, the ratio is smaller for a corrected model than for a misspecified model. \bcw{Get rid of this sentence?} We also expect that our theoretical ratio produces a reasonable estimate of the empirical value, in particular one that tracks the scaling of the misspecification level. 
 We present the results in \autoref{fig:data_value_ratio}. In the well-specified case ($d = 0$), $V(n)$ is small (less than $5$) and roughly constant across $n$. Under misspecification however, the data value ratio grows with both $d$ and $n$ albeit much more slowly for the corrected setting, aligning with our theoretical findings. 
 
-%%%%% Uncomment
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=.4\textwidth]{figures/data_value_ratio_vs_n.png}
-%     %
-%     \caption{Data value ratio vs. $n$, using both the baseline weak supervision model and the corrected model, which aggregates results over triplets using medians. Note that $d=0$ represents the well-specified setting. %We see that in the well-specified case ($d=0$) the data value ratio is small and roughly constant across $n$. Under misspecification, the data value ratio grows with $d$ for both the baseline and corrected models, but grows faster for baseline models, as reflected by our theoretical model.
-%     }
-%     \label{fig:data_value_ratio}
-% \end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=.4\textwidth]{eps_figures/data_value_ratio_vs_n.eps}
+    %
+    \caption{Data value ratio vs. $n$, using both the baseline weak supervision model and the corrected model, which aggregates results over triplets using medians. Note that $d=0$ represents the well-specified setting. %We see that in the well-specified case ($d=0$) the data value ratio is small and roughly constant across $n$. Under misspecification, the data value ratio grows with $d$ for both the baseline and corrected models, but grows faster for baseline models, as reflected by our theoretical model.
+    }
+    \label{fig:data_value_ratio}
+\end{figure}
 
 %Based on Theorems \ref{thm:labeled} and \ref{thm:unlabeled}, we see that this ratio captures the tradeoff between $\varepsilon_{\max} \big(\frac{c_1 d}{m} + \frac{c_2 m}{\sqrt{n_U}} + \frac{c_3 m}{n_U} \big) + \frac{c_4 m}{n_U}$ and $\frac{m}{2n_L}$. In particular, %for a weakly labeled dataset to have a better generalization error, 
 % we must have that $\alpha(n) = c\big(\frac{\varepsilon_{\max} n m^2}{m^2 - \varepsilon_{\max} d n}\big)^2$ for some constant $c$ and $n < \frac{m^2}{\varepsilon_{\max} d}$; when $n$ is too large, it is possible that no amount of unlabeled data can achieve the same generalization error due to the standing bias. Therefore, as any  one of $n, \varepsilon_{\max}$, or $d$ increases, the threshold for weakly labeled points becomes higher. On the other hand, if we were to ignore misspecification, we only require that $V(n) = 2c_4$ be a constant value, which as a criterion could lead to wrong decisions if the model is actually incorrect.
@@ -110,12 +109,11 @@ The weights $\alpha$ are reported in the Appendix. The optimal weights for the w
 
 % We further expect the James-Stein-type estimator to perform better under misspecification where the unlabeled estimator is biased and the simple linear combination to perform better for well-specified models. Results in \autoref{fig:combined}.
 
-%%%%% UNCOMMENT
-% \begin{figure}
-%     \centering
-%     \includegraphics[width=.48\textwidth]{figures/combined.png}
-%     %
-%     \caption{Excess generalization error for an optimally weighted combination of labeled and unlabeled estimators, and a combination weighted according to \cite{GreenStrawderman2001} across the well-specified (left), misspecified (center), and corrected (right) settings. %The approach of \cite{GreenStrawderman2001} does not consistently outperform the unlabeled only approach in the well-specified case, where the unlabeled estimator is unbiased. However, it significantly outperforms either individual approach in the misspecified case and outperforms either individual approach in the corrected case. The combination weights are reported in the \todo{Appendix}. Broadly, the optimal weights for the well-specified and corrected settings are higher than the misspecified setting, and these weights decrease with $n_L$.
-%     }
-%     \label{fig:combined}
-% \end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=.48\textwidth]{eps_figures/combined.eps}
+    %
+    \caption{Excess generalization error for an optimally weighted combination of labeled and unlabeled estimators, and a combination weighted according to \cite{GreenStrawderman2001} across the well-specified (left), misspecified (center), and corrected (right) settings. %The approach of \cite{GreenStrawderman2001} does not consistently outperform the unlabeled only approach in the well-specified case, where the unlabeled estimator is unbiased. However, it significantly outperforms either individual approach in the misspecified case and outperforms either individual approach in the corrected case. The combination weights are reported in the \todo{Appendix}. Broadly, the optimal weights for the well-specified and corrected settings are higher than the misspecified setting, and these weights decrease with $n_L$.
+    }
+    \label{fig:combined}
+\end{figure}
