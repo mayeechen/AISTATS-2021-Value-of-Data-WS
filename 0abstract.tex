@@ -1,53 +1,29 @@
-Labeling data for modern machine learning is expensive and time-consuming. Weak supervision (WS) combines unlabeled data and weak sources to learn a model that generates a large weakly labeled dataset. Such models can also benefit from labeled data, presenting a key tradeoff: should a user invest in few labeled points or many unlabeled points? 
-We answer this via a framework centered on model misspecification in WS. Our core result is an exact bias-variance decomposition of the generalization error, which shows that the unlabeled-only approach incurs additional bias under misspecification.
-To address this bias, we give general ways to correct misspecification. We then apply our framework to three scenarios---misspecified, corrected, and well-specified models---to 1) assess the value of labeled vs unlabeled data and 2) learn from a combination of both. In line with our error decomposition, we show theoretically that labeled data is more valuable for misspecified models and confirm this on synthetic data.
-On a real-world WS dataset, where our model is inevitably misspecified, using 40 labeled data points performs the same as using the entire unlabeled dataset of 1586 points, and combining the two types of data outperforms either alone.
+Labeling data for modern machine learning is expensive and time-consuming. Latent variable models are used to infer labels from weaker, easier-to-acquire sources operating on unlabeled data.
+Such models can also be trained using labeled data, presenting a key question: should a user invest in few labeled or many unlabeled points? We answer this via a framework centered on model misspecification in method-of-moments latent variable estimation.
+%
+Our core result is an exact bias-variance decomposition of the generalization error, which shows that the unlabeled-only approach incurs additional bias under misspecification. We introduce a correction that provably removes this bias in certain cases.
+%
+We apply our decomposition to three scenarios---well-specified, misspecified, and corrected models---to 1) choose between  labeled and unlabeled data and 2) learn from a combination. We observe theoretically and with synthetic experiments that for well-specified models, labeled points are worth a constant factor more than unlabeled points. With misspecification, their relative value is higher due to the additional bias but is reduced with correction. We also apply our approach to study real-world weak supervision techniques for dataset construction.
 
 
- 
-%While modern machine learning requires large datasets, labeling data is expensive and time consuming. 
-%
-%\steve{do we need to talk about semi-supervised learning here? Might simplify a bit to not talk about it here} Semi- and weakly-supervised learning frameworks address this issue by using few (or no) labeled points but many unlabeled or weakly labeled points to learn an intermediate model that generates a large labeled dataset.
-%
-%Such approaches present a key tradeoff: for a fixed budget, should a practitioner add a few labeled points, or a larger quantity of weakly labeled points?
-%%%%%%%%%%%%%%%%%%%%%%%%% Alternative first three sentences
-%\bcw{I like the first version of the first three sentences (I think it does a better job of presenting the broader point of ``value of weak supervision vs. value of full supervision''), though do agree with Steve that the point about semi-supervised learning probably isn't necessary.} While modern machine learning requires large datasets, labeling data is expensive and time consuming. Data programming addresses this issue via creating weakly labeled datasets by learning a model of labeling functions from unlabeled data. In this setting, what is the value of a few gold labels to help estimate the labeling function model?
-%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%% V3 (lol)
-%\bcw{Modern machine learning applications are often bottle-necked by the amount of available labeled training data. Weakly-supervised learning frameworks address this issue by using heuristics to produce weak labels over large, cheaply-acquired unlabeled datasets, rather than labeling data points individually. Practitioners with a fixed budget face a key tradeoff: add a few labeled points, or a larger quantity of weakly labeled points?
+%OLD
+%Labeling data for modern machine learning is expensive and time-consuming while unlabeled data is is generally less informative but easier to acquire, presenting a tradeoff. %\steve{I think this first sentence could be improved to make the tradeoff make more sense: ``Labeling data for modern machine learning is expensive and time-consuming while unlabeled data is generally less informative but easier to acquire, presenting a tradeoff''} %This presents a key tradeoff: should a user invest in few labeled or many unlabeled points? 
+%We consider probabilistic models for generating labels, for which both labeled and unlabeled data can be used as input. In the former case, these models have directly computable parameters, while in the latter, they reduce to \textit{latent variable models} where approaches such as method-of-moments are needed to infer labels. 
+%Motivated by weak supervision as an application, we study the impact of model misspecification on method-of-moments estimators and their ability to generate accurate labels. Our core result is an exact bias-variance decomposition of the generalization error for such models, which shows that the unlabeled-only approach incurs additional bias under misspecification. We introduce a corrected estimator that provably removes this bias under certain conditions.
+%We apply our decomposition framework to three scenarios---well-specified models, misspecified models, and misspecified models with our corrected estimator---to 1) assess labeled vs unlabeled data and 2) learn from a combination of both. We observe theoretically and with synthetic experiments that for well-specified models, labeled points are worth a constant factor more than unlabeled points in terms of generalization error. For misspecified models, their relative value based on our framework is higher due to the additional bias in the unlabeled approach but can be reduced when our correction mechanism is applied.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%It should be a bit more clear.
-%Our main result allows us to precisely express Blah. 
-%A consequence of that is that we can: (1) assess the value of supervision, as a function of misspecifcaiton — and here are somethings
-%
-%(2) ...It should be written more like a theory paper.
-%IT’s not clear what the James-stein estimator does here.
-%We introduce a theoretical framework to answer this question. Our first result is an exact bias-variance decomposition for weak supervision (WS) models under misspecification, in the presence of which using weakly labeled data incurs additional bias over labeled data.
-%we show that using weakly labeled data incurs additional bias due to misspecification.
-%
-%This bias motivates us to propose a way to correct for misspecification that is also applicable to more general method-of-moments approaches in latent variable estimation. We then apply our framework to three scenarios---misspecified, corrected, and well-specified models---to 1) assess the value of supervision and 2) combine different types of supervision \steve{Can we be more precise/specific instead of ``combine different types of supervision''?}.
-%As a result, we can (1) introduce new ways to reduce the impact of misspecification for general method-of-moments estimators, (2) assess the value of supervision as a function of misspecification and source weakness, and (3) combine different types of supervision.
-%
-%We introduce a theoretical model to express the value of supervision. Motivated by the weak supervision setting, we use a graphical model to compare the performance of generative classifiers learned from labeled versus unlabeled data. In particular, we perform error analysis in the presence of model misspecification, which plays an important role in establishing a criterion for deciding between datasets. 
-%In addition, we propose ways to correct for misspecification, as well as techniques for learning from both types of datasets under misspecification. 
-%Weak supervision frameworks have experts instead create \textit{labeling functions}, noisy and conflicting rules which can be applied to large unlabeled datasets and aggregated to produce labels. 
-%
-%Aggregation methods estimate the accuracies of labeling functions using \textit{only unlabeled data}---but small amounts of hand-labels can also be used for accuracy estimation. 
-%
-%In this work, we quantify a key tradeoff in weak supervision pipelines: should a practitioner expand her dataset with fewer but more accurate hand-labeled points, or noisier but more numerous unlabeled points? 
-%
-%We introduce a theoretical model to express the value of labeled versus unlabeled data and demonstrate the importance of model misspecification to this tradeoff, yielding a practical criterion for choosing between and utilizing both types of data simultaneously.
-%
-%We validate our findings empirically, gaining new insights useful to practitioners. 
-%
-%Empirically, for corrected and well-specified models, each labeled point gives the same increase in performance as \textcolor{red}{x} weakly labeled points; for misspecified models, labeled points are more valuable: introducing just \textcolor{red}{x\%} labeled points on a WS benchmark dataset provides a \textcolor{red}{x} increase. Similarly, combining both labeled and weakly labeled data provides the biggest relative improvement over weakly labeled data under misspecification, and we confirm that our observations persist in downstream models.  
 
-%labeled points have low value relative to weakly labeled points (i.e., the same expected increase in performance as only five weakly labeled points), but for
-%high misspecification, the value is significant: on a typical classification task, introducing just $70$ hand-labels (out of $1586$ training points) provides a $3.2$ point increase in test accuracy. 
-%
-%To get the best of both worlds, we use a James-Stein type estimator to combine both kinds of data, outperforming using either individually as well as naive linear combinations by {\color{red}{}X$\%$.}
+% OLD OLD
+%Labeling data for modern machine learning is expensive and time-consuming. Weak supervision (WS) combines unlabeled data and weak sources to learn a model that generates a large labeled dataset. Such models can also benefit from labeled data, presenting a key tradeoff: should a user invest in few labeled or many unlabeled points? 
+%We present a framework centered on model misspecification in WS algorithms. Our core result is an exact bias-variance decomposition of the generalization error, which shows that the unlabeled-only approach incurs additional bias under misspecification. We introduce a correction mechanism that is broadly applicable to method-of-moments approaches and provably removes this bias under certain conditions.
+%We apply our decomposition framework to three scenarios---well-specified models, misspecified models, and misspecified models with our correction mechanism---to 1) choose between using labeled vs unlabeled data and 2) learn from a combination of both. We observe theoretically and with synthetic experiments that for well-specified models, labeled points are worth a constant factor more than unlabeled points in terms of generalization error. For misspecified models, their relative value based on our framework is higher due to the additional bias in the unlabeled approach but can be reduced when our correction mechanism is applied.
 
-%We explore when and how a small number of gold labels can be valuable within the data programming pipeline. We propose a simple maximum likelihood estimation approach for estimating labeling function accuracies from both unlabeled and labeled data. This approach relies on the assumption that the labeling functions are conditionally independent given the gold label, similar to other standard data programming approaches.
-%When this assumption is met, we find empirically that each gold labeled data point achieves the same expected increase in performance as only a few (less than $5$ for reasonable data distributions) unlabeled data points, regardless of the current number of data points. When the conditional independence assumption is not met, we find that having access to gold labels can provide significant increases in performance compared to only having unlabeled data. % On a Spam classification dataset observing $70$ labels (of $1586$ training points) provides a $3.2$ point increase in test set accuracy.
+%the relative amount of unlabeled data to match an improvement in generalization error with additional labeled data is a small constant, while for misspecified models, the asymptotic bias of the unlabeled-only approach grows with more dependencies.
+
+
+
+%% Previous version
+%Labeling data for modern machine learning is expensive and time-consuming. Weak supervision (WS) combines unlabeled data and weak sources to learn a model that generates a large labeled dataset. Such models can also benefit from labeled data, presenting a key tradeoff: should a user invest in few labeled or many unlabeled points? 
+%We answer this via a framework centered on model misspecification in WS that is broadly applicable to method-of-moments estimators. Our core result is an exact bias-variance decomposition of the generalization error, which shows that the unlabeled-only approach incurs additional bias under misspecification. We then give a correction mechanism.
+%We apply our framework to three scenarios---well-specified, misspecified, and corrected models---to 1) assess the value of labeled vs unlabeled data and 2) learn from a combination of both. In line with our error decomposition, we show theoretically that labeled data is more valuable for misspecified models and confirm this on synthetic data.
+%On a real-world WS dataset, where our model is inevitably misspecified, using 40 labeled data points performs the same as using the entire unlabeled dataset of 1586 points, and combining the two types of data outperforms either alone.

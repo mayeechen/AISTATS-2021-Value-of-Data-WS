@@ -46,7 +46,7 @@ Taking the expectation on both sides, we get
 -\E{\N, \tau}{\log \frac{1 + \widetilde{a}_i}{1 + a_i}} &\approx -\Big(\log \frac{1 + \bar{a}_i}{1 + a_i} + \frac{\E{\N, \tau}{\widetilde{a}_i} - \bar{a}_i}{1 + \bar{a}_i} - \frac{1}{2(1 + \bar{a}_i)^2} \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}\Big) + o(1/n) \\
 &= \log \Big(1 + \frac{a_i - \bar{a}_i}{1 + \bar{a}_i} \Big) + \frac{\E{\N, \tau}{\bar{a}_i - \widetilde{a}_i}}{1 + \bar{a}_i} + \frac{1}{2(1 + \bar{a}_i)^2} \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2} + o(1/n),
 \end{align*}
-where we have used Lemma \textcolor{red}{TAYLOR APPROXIMATION ERROR...need to expand out to interchange the $\tau$}. 
+where we have used Lemma \ref{lemma:taylor}. 
 
 Similarly, we apply a second-order Taylor approximation of $f(x) = \log \frac{1 - x}{1 - a_i}$ at $x = \bar{a}_i$:
 \begin{align*}
@@ -65,7 +65,112 @@ Substituting these expressions into \eqref{eq:estimation2}, we get our desired e
 \end{proof}
 
 
-Taylor approximation error 
+
+
+
+
+
+
+
+
+
+\begin{lemma}
+The remainder of the Taylor approximation done in Lemma \ref{lemma:KL_estimation} is $o(1/n)$ for estimation done on $n$ samples in both the labeled and unlabeled cases.
+\label{lemma:taylor}
+\end{lemma}
+
+\begin{proof}
+The remainder for $-\E{\N, \tau}{\log \frac{1 + \widetilde{a}_i}{1 + a_i}}$ is bounded by $\frac{1}{3(1 + \bar{a}_i)^3}\E{\N, \tau}{(\bar{a}_i - \widetilde{a}_i)^3}$, and the remainder for $-\E{\N, \tau}{\log \frac{1 - \widetilde{a}_i}{1 - a_i}}$ is bounded by $\frac{1}{(1 - \bar{a}_i)^3} \E{\N, \tau}{(\bar{a}_i - \widetilde{a}_i)^3}$.
+
+For the labeled data case, it is easy to check that $\E{\N}{(\bar{a}_i - a_i)^3} \sim \mathcal{O}(1/n_L^2)$. Therefore, we focus on analyzing the unlabeled data case's estimator by bounding $\E{\N}{|\bar{a}_i - \widetilde{a}_i|^3 \; | \; \lf_j, \lf_k}$ independent of choice of $j$ and $k$. For ease of notation, define $X =\lf_i \lf_j$ and $Y = \lf_i \lf_k$, such that $XY = \lf_j \lf_k$, and let 
+\begin{align}
+    a := \bar{a}_i^{(j, k)} = \sqrt{  \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]}   } \\
+    \hat{a} := \widetilde{a}_i = \sqrt{  \frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]}   }
+\end{align}
+
+Note $a \in [-1,1]$, so clip $\hat{a} \in [-1,1]$. Because $X \in \{-1,1\}$ and $\hat{\mathbb{E}}[X]$ is an i.i.d. sum of $n = n_U$ samples from $X$, we can apply Hoeffding's inequality to get:
+\begin{align}
+    \Pr \left( |\hat{\mathbb{E}}[X] - \mathbb{E}[X]| \geq \epsilon \right) &\leq 2 \exp \left( - \frac{2 n^2 \epsilon^2}{n 2^2}   \right) = 2 \exp \left( - \frac{n \epsilon^2}{2} \right)
+\end{align}
+
+The same is true for $\hat{\mathbb{E}}[Y]$ and $\hat{\mathbb{E}}[XY]$. Thus, by union bound,
+\begin{align}
+    \Pr \left( |\hat{\mathbb{E}}[X] - \mathbb{E}[X]| \geq \epsilon \vee |\hat{\mathbb{E}}[Y] - \mathbb{E}[Y]| \geq \epsilon \vee |\hat{\mathbb{E}}[XY] - \mathbb{E}[XY]| \geq \epsilon \right) &\leq 6 \exp \left( - \frac{n \epsilon^2}{2} \right)
+\end{align}
+
+Refer to the event $\left( |\hat{\mathbb{E}}[X] - \mathbb{E}[X]| \geq \epsilon \vee |\hat{\mathbb{E}}[Y] - \mathbb{E}[Y]| \geq \epsilon \vee |\hat{\mathbb{E}}[XY] - \mathbb{E}[XY]| \geq \epsilon \right)$ as $B$. If $\neg B$ and $\epsilon< \frac{1}{2} \min(\mathbb{E}[X], \mathbb{E}[Y], \mathbb{E}[XY]) < 1$, then
+\begin{align}
+    |\hat{\mathbb{E}}[X] - \mathbb{E}[X]| &< \epsilon \\
+    |\hat{\mathbb{E}}[Y] - \mathbb{E}[Y]| &< \epsilon \\
+    |\hat{\mathbb{E}}[XY] - \mathbb{E}[XY]| &< \epsilon
+\end{align}
+
+By the mean value theorem with $f(x) = \sqrt{x}$, there exists a $u$ between $\frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]}$ and $\frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]}$ such that 
+\begin{align}
+    \left| \hat{a} -  a \right| &= \left| \frac{1}{2\sqrt{u}} \left(\frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]} - \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \right) \right|
+\end{align}
+
+Note that 
+\begin{align}
+    u &\geq \min \left( \frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]}, \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \right) \geq \min \left( \frac{(\mathbb{E}[X] - \epsilon) (\mathbb{E}[Y] - \epsilon)}{\mathbb{E}[XY] + \epsilon}, \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \right) \\
+      &\geq \min \left( \frac{(\mathbb{E}[X]/2) (\mathbb{E}[Y]/2)}{1 + \epsilon}, \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \right) \geq \min \left( \frac{\mathbb{E}[X] \mathbb{E}[Y]}{8}, \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \right) \geq \frac{\mathbb{E}[X] \mathbb{E}[Y]}{8}
+\end{align}
+
+Thus,
+\begin{align}
+    | \hat{a} -  a | &\leq \frac{\sqrt{2}}{\sqrt{\mathbb{E}[X] \mathbb{E}[Y]}} \left| \frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]} - \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]}  \right|.
+\end{align}
+
+For the term on the right inside the absolute value:
+\begin{align}
+    \frac{(\mathbb{E}[X] - \epsilon)(\mathbb{E}[Y] - \epsilon)}{\mathbb{E}[XY] + \epsilon} &\leq \frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]} \leq \frac{(\mathbb{E}[X] + \epsilon)(\mathbb{E}[Y] + \epsilon)}{\mathbb{E}[XY] - \epsilon} \\
+    \frac{(\mathbb{E}[X] - \epsilon)(\mathbb{E}[Y] - \epsilon)}{\mathbb{E}[XY] + \epsilon}  - \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} &\leq \frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]} - \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \leq \frac{(\mathbb{E}[X] + \epsilon)(\mathbb{E}[Y] + \epsilon)}{\mathbb{E}[XY] - \epsilon} - \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \\
+    \left| \frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]} - \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \right| &\leq \max \bigg( \left|  \frac{(\mathbb{E}[X] - \epsilon)(\mathbb{E}[Y] - \epsilon)}{\mathbb{E}[XY] + \epsilon}  - \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \right|, \\
+    &\left| \frac{(\mathbb{E}[X] + \epsilon)(\mathbb{E}[Y] + \epsilon)}{\mathbb{E}[XY] - \epsilon} - \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \right| \bigg).
+\end{align}
+
+Examining the left term in the max,
+\begin{align}
+    \left| \frac{(\mathbb{E}[X] - \epsilon)(\mathbb{E}[Y] - \epsilon)}{\mathbb{E}[XY] + \epsilon}  - \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \right| &= \left| \frac{(\mathbb{E}[X] - \epsilon)(\mathbb{E}[Y] - \epsilon)\mathbb{E}[XY] - \mathbb{E}[X] \mathbb{E}[Y] (\mathbb{E}[XY] + \epsilon)}{\mathbb{E}[XY](\mathbb{E}[XY] + \epsilon)} \right| \\
+    &= \left|\frac{ -\epsilon (\mathbb{E}[X] \mathbb{E}[Y] + \mathbb{E}[X] \mathbb{E}[XY] + \mathbb{E}[Y] \mathbb{E}[XY] - \epsilon \mathbb{E}[XY])}{\mathbb{E}[XY](\mathbb{E}[XY] + \epsilon)} \right| \\
+    &\leq \epsilon \left| \frac{ \mathbb{E}[X] \mathbb{E}[Y] + \mathbb{E}[X] \mathbb{E}[XY] + \mathbb{E}[Y] \mathbb{E}[XY]}{\mathbb{E}[XY]^2} \right| \\
+    &= \epsilon C_1 > 0
+\end{align}
+
+Examining the right term in the max,
+\begin{align}
+    \left| \frac{(\mathbb{E}[X] + \epsilon)(\mathbb{E}[Y] + \epsilon)}{\mathbb{E}[XY] - \epsilon}  - \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \right| &= \left| \frac{(\mathbb{E}[X] + \epsilon)(\mathbb{E}[Y] + \epsilon)\mathbb{E}[XY] - \mathbb{E}[X] \mathbb{E}[Y] (\mathbb{E}[XY] - \epsilon)}{\mathbb{E}[XY](\mathbb{E}[XY] - \epsilon)} \right| \\
+    &= \left|\frac{ \epsilon (\mathbb{E}[X] \mathbb{E}[Y] + \mathbb{E}[X] \mathbb{E}[XY] + \mathbb{E}[Y] \mathbb{E}[XY] + \epsilon \mathbb{E}[XY])}{\mathbb{E}[XY](\mathbb{E}[XY] - \epsilon)} \right| \\
+    &\leq \epsilon \left| \frac{ \mathbb{E}[X] \mathbb{E}[Y] + \mathbb{E}[X] \mathbb{E}[XY] + \mathbb{E}[Y] \mathbb{E}[XY] + \mathbb{E}[XY]}{\mathbb{E}[XY]^2/2} \right| \\
+    &= \epsilon C_2 > 0
+\end{align}
+
+Combining the max argument bounds,
+\begin{align}
+    \left| \frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]} - \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \right| &\leq \epsilon \max(C_1, C_2) \\
+    &\leq \epsilon C_2
+\end{align}
+
+And thus,
+\begin{align}
+    | \hat{a} -  a | &\leq \epsilon \frac{\sqrt{2}C_2}{\sqrt{\mathbb{E}[X] \mathbb{E}[X]}} = \epsilon C_3
+\end{align}
+
+where $C_3$ is a positive function of $\mathbb{E}[X]$, $\mathbb{E}[Y]$, and $\mathbb{E}[XY]$. To recap, this is satisfied if $\neg B$ and $\epsilon$ is small. Let $\epsilon = n^{-3/8}$, thus for large enough $n$, $\epsilon$ is smaller than any constant. Recall, $\Pr(B) \leq 6 \exp( - n \epsilon^2 / 2)$. With this definition of $\epsilon$, $\Pr(B) \leq 6 \exp(-n^{1/4}/2)$.
+
+Now, we are finally ready to evaluate the limit,
+\begin{align}
+    \lim_{n \rightarrow \infty} n \mathbb{E}[ |\hat{a} - a|^3 ] &= \lim_{n \rightarrow \infty} n \left( \mathbb{E}[ |\hat{a} - a|^3 | B] \Pr(B) + \mathbb{E}[ |\hat{a} - a|^3 | \neg B] P(\neg B) \right) \\
+    &\leq \lim_{n \rightarrow \infty} n \left(C_3^3 \epsilon^3 \cdot 1 + 2^3 \cdot 6\exp(-n^{1/4}/2) \right) \\
+    &= C_3^3 \lim_{n \rightarrow \infty} n (n^{-3/8})^3 + 48 \lim_{n \rightarrow \infty} n \exp(-n^{1/4}/2) \\
+    &= C_3^3 \lim_{n \rightarrow \infty} n^{-1/8} + 48 \lim_{m \rightarrow \infty} m^4 \exp(-m/2) \\
+    &= 0
+\end{align}
+
+Trivially, $\lim_{n \rightarrow \infty} n \mathbb{E}[ |\hat{a} - a|^3 ] \geq 0$. Thus, $\lim_{n \rightarrow \infty} n \mathbb{E}[ |\hat{a} - a|^3 ] = 0$
+\end{proof}
+
+
 
 \begin{lemma}
 If $(i, j) \in E_{\lf}$, then
@@ -174,7 +279,7 @@ $Z'$ can be written as $\sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j) \sum_{
 \end{lemma}
 
 \begin{proof}
-First, note that $\E{\N, \tau}{\bar{a}_i - \widetilde{a}_i} = \E{\N, \tau}{\E{\tau}{\bar{a}_i^{(j, k)}} - \widetilde{a}_i} = \E{\N, \tau}{\bar{a}_i^{(j, k)} - \widetilde{a}_i}$. Therefore, is it sufficient to produce an upper bound on $\E{\N}{\bar{a}_i - \widetilde{a}_i | \lf_j, \lf_k}$ independent of $j, k$. For ease of notation, we efer to this expectation as $\E{}{\bar{a}_i - \widetilde{a}_i}$. Then, $\E{}{\bar{a}_i - \widetilde{a}_i} = \E{}{ \frac{\bar{a}_i^2 - \widetilde{a}_i^2}{\bar{a}_i + \widetilde{a}_i} } \le  \frac{1}{2b_{\min}} \E{}{|\bar{a}_i^2 - \widetilde{a}_i^2 |}$. Denote $M_{ij} = \E{}{\lf_i \lf_j}$ and $\hat{M}_{ij} = \Ehat{\lf_i \lf_j}$. Then, by definition of our estimator in \eqref{eq:triplet},
+First, note that $\E{\N, \tau}{\bar{a}_i - \widetilde{a}_i} = \E{\N, \tau}{\E{\tau}{\bar{a}_i^{(j, k)}} - \widetilde{a}_i} = \E{\N, \tau}{\bar{a}_i^{(j, k)} - \widetilde{a}_i}$. Therefore, is it sufficient to produce an upper bound on $\E{\N}{\bar{a}_i^{(j, k)} - \widetilde{a}_i | \lf_j, \lf_k}$ independent of $j, k$. For ease of notation, we efer to this expectation as $\E{}{\bar{a}_i - \widetilde{a}_i}$. Then, $\E{}{\bar{a}_i - \widetilde{a}_i} = \E{}{ \frac{\bar{a}_i^2 - \widetilde{a}_i^2}{\bar{a}_i + \widetilde{a}_i} } \le  \frac{1}{2b_{\min}} \E{}{|\bar{a}_i^2 - \widetilde{a}_i^2 |}$. Denote $M_{ij} = \E{}{\lf_i \lf_j}$ and $\hat{M}_{ij} = \Ehat{\lf_i \lf_j}$. Then, by definition of our estimator in \eqref{eq:triplet},
 \begin{align}
     \E{}{\bar{a}_i - \widetilde{a}_i} &\le \frac{1}{2b_{\min}} \E{}{\frac{\hat{M}_{ij} \hat{M}_{ik}}{\hat{M}_{jk} M_{jk}} |\hat{M}_{jk} - M_{jk}| + \frac{\hat{M}_{ij}}{M_{jk}}|\hat{M}_{ik} - M_{ik}| + \frac{M_{ik}}{M_{jk}} |\hat{M}_{ij} - M_{ij} | } \label{eq:M_decomposition} \\
     &\le \frac{1}{2b_{\min}} \E{}{\frac{1}{b_{\min}^2} |\delta_{jk}| + \frac{1}{b_{\min}} |\delta_{ik} | + \frac{1}{b_{\min}}|\delta_{ij} |},\nonumber
@@ -192,7 +297,7 @@ Formally, $\hat{M}_{ij} = \frac{1}{n_U} \sum_{l = 1}^{n_U} \lf_i^l \lf_j^l$. The
 \end{align*}
 
 
-Next, to bound $\E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}$, it is sufficient to upper bound $\E{\N}{(\widetilde{a}_i - \bar{a}_i)^2 \; | \; \lf_j, \lf_k}$ independent of choice of $j$ and $k$. Refer to this expectation as $\E{}{(\widetilde{a}_i - \bar{a}_i)^2}$. Then, $\E{}{(\widetilde{a}_i - \bar{a}_i)^2 } = \E{}{\frac{(\widetilde{a}_i^2 - \bar{a}_i^2)^2}{(\widetilde{a}_i + \bar{a}_i)^2}} \le \frac{1}{4b_{\min}^2} \E{}{(\widetilde{a}_i^2 - \bar{a}_i^2)^2}$. Similar to \eqref{eq:M_decomposition},
+Next, to bound $\E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}$, it is sufficient to upper bound $\E{\N}{(\widetilde{a}_i - \bar{a}_i^{(j, k)})^2 \; | \; \lf_j, \lf_k}$ independent of choice of $j$ and $k$. Refer to this expectation as $\E{}{(\widetilde{a}_i - \bar{a}_i)^2}$. Then, $\E{}{(\widetilde{a}_i - \bar{a}_i)^2 } = \E{}{\frac{(\widetilde{a}_i^2 - \bar{a}_i^2)^2}{(\widetilde{a}_i + \bar{a}_i)^2}} \le \frac{1}{4b_{\min}^2} \E{}{(\widetilde{a}_i^2 - \bar{a}_i^2)^2}$. Similar to \eqref{eq:M_decomposition},
 \begin{align}
     \E{}{(\widetilde{a}_i - \bar{a}_i)^2 } &\le \frac{1}{4b_{\min^2}} \E{}{\left(\frac{\hat{M}_{ij} \hat{M}_{ik}}{\hat{M}_{jk} M_{jk}} |\hat{M}_{jk} - M_{jk}| + \frac{\hat{M}_{ij}}{M_{jk}}|\hat{M}_{ik} - M_{ik}| + \frac{M_{ik}}{M_{jk}} |\hat{M}_{ij} - M_{ij} |  \right)^2} \\
     &\le \frac{1}{4b_{\min}^2} \E{}{\left(\frac{1}{b_{\min}^2} |\delta_{jk}| + \frac{1}{b_{\min}} |\delta_{ik} | + \frac{1}{b_{\min}}|\delta_{ij} | \right)^2} \\
@@ -202,6 +307,4 @@ Next, to bound $\E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}$, it is sufficient
 
 
 \end{proof}
-
-Stuff about graphical model properties
 
