@@ -1,6 +1,7 @@
 \section{Glossary}
 \label{sec:gloss}
 
+
 The glossary is given in Table~\ref{table:glossary} below.
 \begin{table*}[h]
 \centering
@@ -9,23 +10,41 @@ The glossary is given in Table~\ref{table:glossary} below.
 \toprule
 Symbol & Used for \\
 \midrule
-$X$ & Unlabeled data vector, $X = [X^1, X^2, \ldots, X^T] \in \mathcal{X}$. \\
-%$X_i$ & $i$th unlabeled data vector \\
-%$X_i$ & $i$th data element  \\
-%$T$ & Length of the unlabeled data vector \\
-%$\mathcal{T}$ & Task indices \\
-$Y$ & Latent, ground-truth task label vector $[Y^1, Y^2, \ldots, Y^T] \in \mathcal{Y} = \{-1, +1\}$.  \\
-%$\bm{Y}^i$ & $i$th ground-truth label vector \\
-%$Y_i$ & Ground-truth label for $i$th task, $Y_i \in \{-1, +1\}$  \\
-%$r$ & Resolution level. $r=1$ refers to resolution level in which each of the $T$ elements is labeled\\
-$\mathcal{D}$ & Distribution from which $(X, Y)$ data points are sampled i.i.d. \\
-%$S_i$ & $i$th weak supervision source\\
-$m$ & Number of weak supervision labeling functions. \\
-$\lf_i$ & Labeling function $\lf_i: \mathcal{X} \rightarrow \mathcal{Y} \cup \{0\}$; all $m$ labels per $X$ collectively denoted $\bm{\lf}$. \\
-$D$ & Unlabeled dataset $\{X_i\}_{i = 1}^n$ that $\bm{\lf}$ is applied to in order to produce labels. \\
-$n$ & Number of data vectors. \\
-$a_i$ & Accuracy of original labeling function $\Pr(\lf_i = Y | \lf_i \neq 0)$. \\
-$\bar{a}_i$ & Accuracy of extended labeling function $\Pr(\bar{\lf}_i = Y | \bar{\lf}_i \neq 0)$. \\
+$X$ & An input vector $X\in\mathcal{X}$.\\
+$Y$ & A latent ground-truth label $Y\in\mathcal{Y}=\{-1,1\}$.\\
+$m$ & Number of sources.\\
+$\lf_j$ & $j$th source output $\lf_j: \mathcal{X} \rightarrow \mathcal{Y}$; all $m$ labels make up vector $\bm{\lf}$ \\
+%$\bm{\lambda}$ & A vector of source outputs $\bm{\lambda}\in\mathcal{Y}^m$.\\
+$\widetilde{Y}$ & Probabilistic label in $[-1, 1]$ output by the latent variable model.\\
+$n_U$ & Number of unlabeled samples.\\
+$n_L$ & Number of labeled samples.\\
+$\Theta$ & Canonical parameters of the Ising model for $\Pr(Y,\bm{\lambda})$.\\
+$G$ & Dependency graph $G=(V,E)$ over sources and the latent ground-truth label.\\
+$E_\lambda$ & Edges among sources in $G$.\\
+$d$ & Number of dependencies among sources $d=|E_\lambda|$.\\
+$a_i$ & True accuracy of the $i$th source $\mathbb{E}[\lambda_iY]$.\\
+$\widetilde{a}_i^U$ & Estimated accuracy of the $i$th source using unlabeled data via the triplet method.\\
+$\widetilde{a}_i^L$ & Estimated accuracy of the $i$th source using labeled data, i.e. $\Ehat{\lf_i Y}$.\\
+$\widetilde{a}_i^M$ & Estimated accuracy of the $i$th source using unlabeled data via the\\
+& triplet method and median aggregation.\\
+$\mathcal{N}$ & Random variable representing dataset used.\\
+$\tau$ & Algorithmic randomness for estimating accuracies via triplet method.\\
+$R,R_U,R_L,R_M$ & Generalization error $R = \mathbb{E}_{(Y, \bm{\lf}), \N, \tau}[l(\widetilde{Y}, Y)]$. $R_U,R_L,R_M$ are for $\widetilde{a}_i^U,\widetilde{a}_i^L,\widetilde{a}_i^M$, respectively, \\
+& and $l(\cdot, \cdot)$ is the cross-entropy loss.\\
+% $R_U$ & Generalization error when using the triplet method.\\
+% $R_L$ & Generalization error when estimating accuracies empirically.\\
+% $R_M$ & Generalization error when using the triplet method with median aggregation.\\
+$R^e,R^e_U,R^e_L,R^e_M$ & Excess generalization error $R^e=R-H(Y|\bm{\lambda})$.\\
+$\mathcal{B}_I$ & Inference bias $\mathcal{B}_I=\sum_{(i, j) \in E_\lf}I(\lf_i; \lf_j | Y)$.\\
+$\mathcal{B}_\text{est}$ & Parameter estimation error.\\
+$\varepsilon_{ij}$ & Extent of misspecification on a single pair of sources $\varepsilon_{ij} = \E{}{\lf_i \lf_j} - \E{}{\lf_i Y} \E{}{\lf_j Y}$.\\
+$\varepsilon_{\min},\varepsilon_{\max}$ & Smallest and largest $\varepsilon_{ij}$ for $(i,j)\in E_\lf$.\\
+$\rho_{n_U}$ & Rate of convergence for $\tilde{a}_i^M$, $\rho_{n_U} = \max_i \E{}{(\widetilde{a}_i^M - a_i)^2}$.\\
+$\alpha(n_U)$ & Minimum labeled points needed for lower generalization error than $n_U$ unlabeled points.\\
+$V(n_U)$ & Data value ratio at $n_U$ unlabeled points.\\
+$\widetilde{V}(n_U)$ & Approximation of data value ratio using upper bounds at $n_U$ unlabeled points.\\
+$\alpha$ & Weight for unlabeled estimator to combine unlabeled and labeled estimators.\\
+$a^{\text{lin}}(\alpha)$ & Linear combination of unlabeled and labeled estimators using weight $\alpha$.\\
 \toprule
 \end{tabular}
 \caption{
@@ -35,3 +54,4 @@ $\bar{a}_i$ & Accuracy of extended labeling function $\Pr(\bar{\lf}_i = Y | \bar
 \end{table*}
 
 
+\vfill

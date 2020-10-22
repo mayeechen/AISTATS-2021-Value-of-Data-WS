@@ -1,21 +1,145 @@
 \section{Additional Theoretical Results}
 
-
+In this section, we discuss how our generalization error bounds, namely the standing $\mathcal{O}(d/m)$ bias for unlabeled data, and our results for the corrected medians estimator can still apply to other method-of-moments estimators that exploit conditionally independent views of hidden variables. Next, we present a lower asymptotic bound on the generalization error for labeled versus unlabeled data. Finally, we give more details about the combined estimators and the generalization bounds from using them.
 
 \subsection{Other Method-of-Moments Estimators}
 
+We present two other method-of-moments estimators and sketch out arguments for how using them (under misspecification) results in the same scaling of generalization error, and for how the median approach is able to help correct standing bias. We then provide an abstracted argument. 
 
+\paragraph{``Quadratic'' Triplets} 
+This alternative latent variable model relies on class-conditional probability terms instead of mean parameters \citep{fu2020fast}, which assume some symmetries in the distribution (see Lemma \ref{lemma:fs_symmetry}). For the $i$th source, we can write the parameters to be estimated as
+\[\mu_i =
+  \begin{bmatrix}
+    \Pr(\lf_i = 1|Y = 1) & \Pr(\lf_i = 1|Y = -1)  \\
+    \Pr(\lf_i = -1|Y = 1) & \Pr(\lf_i = -1|Y = -1)
+  \end{bmatrix}.\] 
 
-\subsection{Lower bounds on generalization error}
+Let
+\[O_{ij} =
+  \begin{bmatrix}
+    \Pr(\lf_i = 1, \lf_j = 1) & \Pr(\lf_i = 1,\lf_j = -1)  \\
+    \Pr(\lf_i = -1,\lf_j = 1) & \Pr(\lf_i = -1,\lf_j = -1)
+  \end{bmatrix}
+  \text{    and    }
+  P =
+  \begin{bmatrix}
+    \Pr(Y=1) & 0  \\
+    0 & \Pr(Y=-1)
+  \end{bmatrix}.
+  \]
 
-
-%Other stuff like abstains????
-
-\subsection{Combined estimator analysis}
-
-
+Then, we obtain that 
 \begin{align}
-    R_{\mathrm{lin}}^{\mathrm{excess}}(\alpha)\le & \varepsilon_{\max}\Big(\frac{c'_1 \alpha d }{m} + \frac{c'_2 \alpha^2 }{\sqrt{n_U}} + \frac{c'_3 \alpha^3 d}{m n_U} \\
-    &+ \frac{\alpha (1 - \alpha)^2 c'_5 d}{m n_L} \Big) + \frac{c'_4 \alpha^2 m}{n_U} \nonumber \\
-    &+ \frac{(1 - \alpha)^2 m}{2n_L} + \B_I + o(1/n_L), \nonumber
+O_{ij} = \mu_i P \mu_j^\top.
+\label{eq:newparam}
 \end{align}
+The left-hand side is observable, and we can form triplets again to solve for each $\mu_i$. 
+Set $\alpha = P(\lf_i =1 |Y=1)$, $c_i = \frac{P(\lf_i = 1)}{P(Y=-1)} $ and $d_i = \frac{P(Y=1)}{P(Y=-1)}$. The top row of $\mu_i$ is then $[\alpha \quad c_i - d_i \alpha]$ with $c_i$ and $d_i$ known. For a triplet $i,j,k$, and the appropriate $\mu$'s, using the $\alpha, \beta, \gamma$ notation above and corresponding $c_i, c_j, c_k$ and $d_i, d_j, d_k$ terms, we obtain the system (see \cite{fu2020fast} for more details)
+\begin{align*}
+(1+d_i d_j) \alpha \beta + c_i c_j - c_i d_j \beta - c_j d_i \alpha &= O_{ij}/\Pr(Y=1), \\
+(1+d_i d_k)\alpha \gamma + c_i c_k - c_i d_k \gamma - c_k d_i\alpha &= O_{ik}/\Pr(Y=1), \\
+(1+d_j d_k)\beta \gamma + c_j c_k - c_j d_k \gamma - c_k d_j \beta &= O_{jk}/\Pr(Y=1). \\
+\end{align*}
+To solve, $\alpha$ and $\gamma$ are expressed with $\beta$ for the first and third equations and this is plugged into the second---yielding a quadratic equation to be solved.
+
+This approach incurs standing bias under misspecification. Quadratic triplets rely on conditional independence by assuming that $\Pr(\lf_i = 1, \lf_j = 1)$ and $\Pr(\lf_i = 1 | Y = 1) \Pr(\lf_j = 1 | Y = 1) \Pr(Y = 1) + \Pr(\lf_i = 1 | Y = -1) \Pr(\lf_j = 1 | Y = -1) \Pr(Y = -1)$ are equal. Suppose, however, that $(i, j) \in E_{\lf}$. Then, $\mu_i P \mu_j^\top$ is no longer equal to $O_{ij}$, but $O_{ij} + \delta_{ij}$, where $\delta_{ij} = \Pr(Y = 1)[\Pr(\lf_i | Y = 1) \Pr(\lf_j | Y = 1) - \Pr(\lf_i, \lf_j | Y = 1)] + \Pr(Y = -1)[\Pr(\lf_i | Y = -1) \Pr(\lf_j | Y = -1) - \Pr(\lf_i, \lf_j | Y = -1)]$. This $\delta_{ij}$ can be written exactly in terms of the canonical parameters $\Theta$ and results in an inconsistent estimator of $\Pr(\lf_i | Y)$. We note that the probability of selecting a bad triplet that leads to this is the same for this method and our main triplet method, so the standing bias still scales $\mathcal{O}(\frac{d \delta}{m})$.
+
+This approach can also be corrected using medians. Out of ${m - 1 \choose 2}$ triplets used in estimating $\Pr(\lf_i | Y)$, there are ${m - 1 \choose 2 } - m - d - 3$ triplets that result in a consistent estimate. So as long as ${m - 1 \choose 2} - m - d - 3 > \frac{1}{2} \cdot {m - 1 \choose 2}$ and $n_U$ is sufficiently large, using medians will result in a corrected estimator. See the proof of Proposition \ref{prop:medians} in section \ref{subsec:medians} for more details. 
+
+\paragraph{Method-of-moments for topic exchange} \cite{anandkumar2014tensor} describes tensor method-of-moments estimators for a variety of applications, including topic models. In the topic model case, $h$ is the topic latent variable, $x_1, \ldots, x_{\ell}$ are the words in the document, all assumed to be conditionally independent given $h$ and drawn from an unknown conditional probability distribution $\mu_h$ parametrized by the latent topic variable. Here, $x_t = e_i$, the standard basis vector if the $t$th word is $i$. \cite{anandkumar2014tensor} uses the fact that 
+\[\mathbb{E}[x_1 \otimes x_2 \otimes x_3] = \sum_{i=1}^k w_i \mu_i \otimes \mu_i \otimes \mu_i,\]
+where $w_i$ is the probability of $h$ being topic $i$, to perform a tensor decomposition of the observable  $\mathbb{E}[x_1 \otimes x_2 \otimes x_3]$ and learn $\mu_h$. Note the similarity to our setting, where $Y$ is used in place of $h$ and where there are two (i.e., a matrix) instead of three views (giving a tensor). Conditional independence (of words given the topic) is required to for this expression to hold. Therefore, when conditional independence is violated, $\sum_{i = 1}^k w_i \mu_i \otimes \mu_i \otimes \mu_i$ is equal to $\E{}{x_1 \otimes x_2 \otimes x_3}$ plus some additional perturbation that is a function of the probability distribution. This error is propagated into the estimate of $\mu_h$, and we assume Lipschitzness of this estimator. Furthermore, assuming random triples are selected to learn the accuracy of each word, using this approach to estimate accuracy parameters will again yield a standing bias.
+
+Furthermore, the medians approach can again correct for this standing bias---there are ${m - 1 \choose 2} - m - d - 3$ good triplets out of ${m - 1 \choose 2}$, so we require the same conditions to yield consistent estimators as those for the quadratic triplets case.
+
+
+\paragraph{Abstraction} Consider in general some observable quantities $o_1, \ldots, o_v$, some unobservable quantities $u_1, \ldots, u_v$ that depend on the value of some latent variable $h$, and a relationship that holds when some set of dependencies $\Omega$ is taken into account, 
+\[ f(o_1, \ldots, o_v) = g_{\Omega}(u_1, \ldots, u_v),\]
+Next, we call $s(f(o_1, \ldots, o_v))$ an estimator that produces estimates of $u_1, \ldots, u_v$. 
+
+Our approach is simply to account for errors due to accessing an incorrect $\Omega’$, where $|\Omega \setminus \Omega’| = d$. Then, 
+\[ f(o_1, \ldots, o_v) = g_{\Omega'}(u_1, \ldots, u_v) + d \times \Delta(u_1, \ldots, u_v),\]
+where $\Delta$ is some error term. Given this setup, we then propagate the error term $\Delta$ in the estimator $s$, computing
+$s(f(o_1, \ldots, o_v)) - s(f(o_1, \ldots, o_v) - d \Delta(u_1, \ldots, u_v)$. This can be done either via perturbation analysis or Taylor approximation or other methods---the only requirement we place is Lipschitzness on the estimator $s$. Then, by randomly selecting subsets of $(o_1, \ldots, o_v)$ to estimate $u_1, \ldots, u_v$, the probability of picking a subset with error scales in $d$, showing that there exists a standing bias that is a function of the number of unmodeled dependencies. Moreover, there are some subsets of $(o_1, \ldots, o_v)$ that yield consistent estimators $s$; if this quantity is greater than half of all the subsets, then a medians approach can be beneficial when there is enough data.
+
+
+\subsection{Asymptotic lower bounds on generalization error}
+
+While Theorems \ref{thm:labeled} and \ref{thm:unlabeled} provide upper bounds on the excess generalization error, it is also important to consider the asymptotic lower bound---is the standing bias from misspecification in the unlabeled approach inevitable? 
+
+Looking at the decomposition in Theorem \ref{thm:decomposition}, $\E{\N}{\KL(\Pr(\bm{\lf}) || \Phat(\bm{\lf}))}$ approaches $0$ asymptotically. We thus seek to asymptotically lower bound $\sum_{i = 1}^m \E{\N, \tau, Y}{\KL( \Pr_{\lf_i | Y} || \Ptilde_{\lf_i | Y})}$. Note that in the labeled data case, parameter estimation error approaches $0$ as $n$ grows large since the observable estimated accuracy is both unbiased and consistent. In the unlabeled data case, we show that standing bias persists.
+
+\begin{theorem}
+Suppose that there are $|E_{\lf}| = d$ unmodeled dependencies. When we use the latent variable model described in section \ref{sec:background}, the lower bound of the excess generalization error is asymptotically bounded by
+\begin{align}
+    \lim_{n_U \rightarrow \infty} R_u^e \ge \frac{(m - 2d) d^2 \varepsilon_{\min}^2 b_{\min}^4}{2(m - 1)^2 (m - 2)^2} + \B_I.
+\end{align}
+
+When $d$ is $o(m)$, the asymptotic parameter estimation error is $\Omega \Big(\frac{d^2 \varepsilon_{\min}^2}{m^3} \Big)$.
+\end{theorem}
+
+\begin{proof}
+We compute an asymptotic lower bound for $\sum_{i = 1}^m \E{\N, \tau, Y}{\KL( \Pr_{\lf_i | Y} || \Ptilde_{\lf_i | Y})}$. Applying Lemma \ref{lemma:KL_estimation}, we see that 
+\begin{align}
+    \lim_{n_U \rightarrow \infty} \sum_{i = 1}^m \E{\N, \tau, Y}{\KL( \mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y})} = \sum_{i = 1}^m \frac{1 + a_i}{2} \log \left(1 + \frac{a_i - \bar{a}_i}{1 + \bar{a}_i}\right) + \frac{1 - a_i}{2} \log \left(1 + \frac{\bar{a}_i - a_i}{1 - \bar{a}_i}\right) \label{eq:lower_bound_est_err}
+\end{align}
+
+We focus on the lower bound of any one element of this sum. For ease of notation, let $a := a_i$ and $x = a_i - \bar{a}_i$. Then this expression for an arbitrary $i$ becomes
+\begin{align}
+    \frac{1 + a_i}{2} \log \left(1 + \frac{a_i - \bar{a}_i}{1 + \bar{a}_i}\right) + \frac{1 - a_i}{2} \log \left(1 + \frac{\bar{a}_i - a_i}{1 - \bar{a}_i}\right) = - \frac{1 + a}{2} \log \left(1 - \frac{x}{1 + a}\right) - \frac{1 - a}{2} \log \left(1 + \frac{x}{1 - a}\right) 
+\end{align}
+
+Take the negative of this expression and define it as a function $f(x)$ to upper bound:
+\begin{align}
+    f(x) = \frac{1 + a}{2} \log \left(1 - \frac{x}{1 + a}\right) + \frac{1 - a}{2} \log \left(1 + \frac{x}{1 - a}\right)
+\end{align}
+
+We show that $f(x) \le - \frac{1}{2}x^2$. Note that for $x = 0$, $f(x) = 0$ and $\frac{1}{2}x^2 = 0$. Then, we must show that for $x \ge 0$, $f'(x) \le -x$ and for $x < 0$, $f'(x) > -x$. Taking the derivative of $f(x)$ gives us $f'(x) = \frac{-x}{1 - (a - x)^2}$, and it is clear that the previous inequalities are satisfied.
+
+Using this fact in \eqref{eq:lower_bound_est_err}, we have that $
+     \lim_{n_U \rightarrow \infty} \sum_{i = 1}^m \E{\N, \tau, Y}{\KL( \mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y})} = \sum_{i = 1}^m \frac{1}{2} (a_i - \bar{a}_i)^2
+$. For $i \in E_{\lf}$, note that by Lemma \ref{lemma:accuracy_bias} it is possible to construct a graphical model such that $a_i - \bar{a}_i = 0$. For $i \in E_{\lf}$, we know that $|a_i - \bar{a}_i|$ is at least $\frac{d \varepsilon_{\min} b_{\min}^2}{(m - 1)(m - 2)}$. Therefore,
+\begin{align}
+    \frac{1}{2} \sum_{i = 1}^m (a_i - \bar{a}_i)^2 \ge \frac{1}{2} \sum_{i \notin E_{\lf}} (a_i - \bar{a}_i)^2 \ge \frac{(m - 2d) d^2 \varepsilon_{\min}^2 b_{\min}^4}{2(m-1)^2 (m-2)^2}.
+\end{align}
+\end{proof}
+
+
+\subsection{Combined estimator analysis} \label{subsec:combined}
+
+The general form of the combined estimator we consider is $a^{\mathrm{lin}}(\alpha) = \alpha \widetilde{a}^U + (1 - \alpha) \widetilde{a}^L$ for some weight $\alpha \in [0, 1]$. The James-Stein type estimator from \cite{GreenStrawderman2001}, which we evaluate empirically, uses the following:
+\begin{align}
+    \bar{a} := \widetilde{a}^U + \bigg(1 - \frac{r}{\|\widetilde{a}^L - \widetilde{a}^U\|_{\Sigma^{-1}}} \bigg)_{\mathclap{+}} (\widetilde{a}^L - \widetilde{a}^U),
+\end{align}
+where $\Sigma = \Cov{}{\widetilde{a}^L}$ and $r \in [0, 2(m - 2)]$. Note that this is almost equivalent to $a^{\mathrm{lin}}\Big(\frac{r}{\|\widetilde{a}^L - \widetilde{a}^U\|_{\Sigma^{-1}}} \Big)$. \cite{GreenStrawderman2001} show that this estimator dominates $\widetilde{a}^L$ when the unbiased estimator is Gaussian and its covariance is known. However, since we can only estimate the covariance matrix, we replace $\Sigma$ with an empirical estimate $\hat{\Sigma}$ in practice. Moreover, since $\widetilde{a}^L$ is only Gaussian asymptotically, we do not provide theoretical guarantees on $\bar{a}$. We instead focus on analyzing the performance of the general combined estimator $a^{\mathrm{lin}}(\alpha)$. 
+
+The change in estimator only impacts the generalization bound via the parameter estimation error,  $\sum_{i = 1}^m \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )}$. We simplify this using Lemma \ref{lemma:KL_estimation}, doing a Taylor approximation on a combined asymptotic estimate $\bar{a}_i^C := \alpha \bar{a}_i + (1 - \alpha) a_i$ rather than $\bar{a}_i$. This gives us
+\begin{align}
+     &\sum_{i = 1}^m \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )} = \sum_{i = 1}^m \frac{1 + a_i}{2} \log \Big(1 + \frac{\alpha(a_i - \bar{a}_i)}{1 + \bar{a}_i^C} \Big) + \frac{1 - a_i}{2} \log \Big(1 + \frac{\alpha(\bar{a}_i - a_i)}{1 - \bar{a}_i^C} \Big) \\
+    +& \sum_{i = 1}^m \frac{a_i - \bar{a}_i}{1 - (\bar{a}_i^C)^2} \alpha^2 \E{}{\bar{a}_i - \widetilde{a}_i^U}  + \sum_{i = 1}^m \frac{1}{2} \Big( \frac{1}{1 - (\bar{a}_i^C)^2} + \frac{2\alpha (\bar{a}_i - a_i)}{(1 - (\bar{a}_i^C)^2)^2}\Big) \Big(\alpha^2 \E{}{(\widetilde{a}_i^U - \bar{a}_i)^2} + (1 - \alpha)^2 \E{}{(\widetilde{a}_i^L - a_i)^2} \Big)
+\end{align}
+
+
+We present bounds for the three settings discussed in the paper.
+
+\paragraph{Well-specified setting} In the well-specified setting, the unlabeled data accuracy estimator is consistent, so $\bar{a}_i = a_i$, and therefore
+\begin{align}
+     &\sum_{i = 1}^m \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )} =  \sum_{i = 1}^m \frac{1}{2} \Big( \frac{1}{1 - a_i^2} \Big) \Big(\alpha^2 \E{}{(\widetilde{a}_i^U - \bar{a}_i)^2} + (1 - \alpha)^2 \E{}{(\widetilde{a}_i^L - a_i)^2} \Big)    
+\end{align}
+
+Using the results of the proof of Theorem \ref{thm:labeled} and the bound on $\E{}{(\widetilde{a}_i^U - \bar{a}_i)^2}$ in Lemma \ref{lemma:sampling_error}, we get that this is at most $\alpha^2 \frac{c_4 m }{n_U} + (1 - \alpha)^2 \frac{m}{2n_L}$.
+
+\paragraph{Misspecified Setting} The constant terms for the bound on accuracy parameter estimation error will change due to $\bar{a}_i^C$ in the denominator rather than $\bar{a}_i$, but the derivation follows our proof for Theorem \ref{thm:unlabeled}. Therefore, for some $c'$,
+\begin{align}
+    \sum_{i = 1}^m \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )} \le & \varepsilon_{\max}\Big(\frac{c'_1 \alpha d }{m} + \frac{c'_2 \alpha^2 }{\sqrt{n_U}} + \frac{c'_3 \alpha^3 d}{m n_U} + \frac{\alpha (1 - \alpha)^2 c'_5 d}{m n_L} \Big) + \frac{c'_4 \alpha^2 m}{n_U} + \frac{(1 - \alpha)^2 m}{2n_L}. \nonumber
+\end{align}
+
+\paragraph{Corrected Setting} Here we consider the combined estimator $\alpha \widetilde{a}^M + (1 - \alpha)\widetilde{a}^L$. Under certain conditions, we know that $\widetilde{a}^M$ asymptotically converges to $a$. Therefore, the accuracy parameter estimation error is
+\begin{align}
+     &\sum_{i = 1}^m \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )} =  \sum_{i = 1}^m \frac{1}{2} \Big( \frac{1}{1 - a_i^2} \Big) \Big(\alpha^2 \E{}{(\widetilde{a}_i^M - \bar{a}_i)^2} + (1 - \alpha)^2 \E{}{(\widetilde{a}_i^L - a_i)^2} \Big)
+\end{align}
+
+$\E{}{(\widetilde{a}_i^M - \bar{a}_i)^2}$ is just the variance of the median estimator. Therefore, this summation is bounded by $\alpha^2 c_{\rho} m \rho_{n_U} + (1 - \alpha)^2 \frac{m}{2n_L}$ under the conditions in Proposition \ref{prop:medians}.
+
+
+

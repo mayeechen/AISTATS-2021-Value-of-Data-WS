@@ -7,12 +7,14 @@
 First, we formally state our assumptions on the graphical model that are needed for our results.
 
 \begin{assumption}
-$a_{\min}, b_{\min}$ (b min is min over both bar b and tilde b?) all positives, edgeset 
+Suppose that the distribution of $\Pr(Y, \bm{\lf})$ takes on the form
+\begin{align}
+    \Pr(Y, \bm{\lf}) = \frac{1}{Z} \exp \Big(\theta_Y + \sum_{i = 1}^m \theta_i \lf_i Y + \sum_{(i, j) \in E_{\lf}} \theta_{ij} \lf_i \lf_j \Big),
+    \label{eq:pgm}
+\end{align}
 
-$\bar{a}_{\max}$
-
-$\frac{d}{m - 2} \le b_{\min} a_{\min}$
-
+where $Z$ is the cumulant function, and all canonical parameters $\Theta$ are positive. This assumption also means that $\E{}{\lf_i \lf_j}, \E{}{\lf_i Y} > 0$ for all $i$ and $j$. Define $a_{\min} = \min_i a_i$ as the minimum true accuracy. Define $b_{\min} = \min_{i,j} \{\E{}{\lf_i \lf_j}, \Ehat{\lf_i \lf_j} \}$. Lastly, define $\bar{a}_{\max} = \max_{i} \bar{a}_i = \max_{i,j,k} \E{\tau}{\sqrt{\frac{\E{}{\lf_i \lf_j} \E{}{\lf_i \lf_k}}{\E{}{\lf_j \lf_k}}}}$.
+\label{assumptions}
 \end{assumption}
 
 \subsection{Proof of Theorem 1}
@@ -85,10 +87,7 @@ Therefore, \eqref{eq:cross-entropy-2} becomes
 \begin{align}
     \E{(Y, \bm{\lf}), \N, \tau}{l(\widetilde{Y}, Y)} &= H(Y | \bm{\lf}) - \E{\N}{\KL (\Pr(\bm{\lf}) || \Phat(\bm{\lf}))} + \sum_{(i, j) \in E_{\lf}} I(\lf_i; \lf_j | Y) + \sum_{i = 1}^m \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )}, \nonumber 
 \end{align}
-
-which is our desired expression.
-
-\todo{bound mutual information}
+%\todo{bound mutual information}
 
 \subsection{Proof of Theorem 2}
 
@@ -98,31 +97,27 @@ Our goal is to evaluate $\sum_{i = 1}^m \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i 
    &=  \frac{1}{2(1 - a_i^2)} \Var{}{\widetilde{a}_i^L} + o(1/n)
 \end{align*}
 
-It can be shown that this is exactly $\frac{1}{2n_L}$. To see this, formally define $\widetilde{a}_i^L = \frac{1}{n_L} \sum_{j = 1}^{n_L} \lf_i^j Y^j$, where $\lf_i^j, Y^j$ belong the $j$th sample of the dataset. Then
-\begin{align}
-    \Var{}{\widetilde{a}_i^L} &= \frac{1}{n_L^2} \sum_{j = 1}^{n_L} \Var{}{\lf_i^j Y^j} = \frac{1}{n_L^2} \sum_{j = 1}^{n_L} \E{}{\lf_i^{j2} Y^{j2}} - \E{}{\lf_i Y}^2 = \frac{1 -a_i^2}{n_L}
-\end{align}
-
+It can be shown that this is exactly $\frac{1}{2n_L}$. To see this, formally define $\widetilde{a}_i^L = \frac{1}{n_L} \sum_{j = 1}^{n_L} \lf_i^j Y^j$, where $\lf_i^j, Y^j$ belong the $j$th sample of the dataset. Then $
+    \Var{}{\widetilde{a}_i^L} = \frac{1}{n_L^2} \sum_{j = 1}^{n_L} \Var{}{\lf_i^j Y^j} = \frac{1}{n_L^2} \sum_{j = 1}^{n_L} \E{}{\lf_i^{j2} Y^{j2}} - \E{}{\lf_i Y}^2 = \frac{1 -a_i^2}{n_L}$.
 Therefore, $\sum_{i = 1}^m \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )} = \frac{m}{2n_L} + o(1/n_L)$, and our proof is complete.
 
 \subsection{Proof of Theorem 3} 
 
-We restate the full theorem with the value of the constants. Under assumption \todo{CITE}, using $n_U$ weakly labeled samples and a misspecified model yields excess generalization error
+We restate the full theorem with the value of the constants. Under assumption \ref{assumptions}, using $n_U$ weakly labeled samples and a misspecified model yields excess generalization error
 \begin{align}
-    R_U^{\mathrm{excess}} \le  & \varepsilon_{\max} \left(\frac{c_1 d}{m} + \frac{c_2}{\sqrt{n_U}} + \frac{c_3 d}{m n_U}\right) \nonumber \\
-    + &\frac{c_4 m}{n_U} + \sum_{(i, j) \in E_{\lf}}I(\lf_i; \lf_j | Y) + o(1/n_U), \nonumber
+    R_U^{e} \le  & \varepsilon_{\max} \left(\frac{c_1 d}{m} + \frac{c_2}{\sqrt{n_U}} + \frac{c_3 d}{m n_U}\right) +\frac{c_4 m}{n_U} + \sum_{(i, j) \in E_{\lf}}I(\lf_i; \lf_j | Y) + o(1/n_U), \nonumber
 \end{align}
 where 
 \begin{align*}
-    c_1 &=  \frac{2}{b_{\min}^2 a_{\min}^2} \left(1 + \frac{1}{1 - \bar{a}_{\max}^2} \right) \\
-    c_2 &= \frac{1}{(1 - \bar{a}_{\max}^2) b_{\min} a_{\min}} \sqrt{\frac{3(1 - b_{\min}^2)}{b_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)} \\
-    c_3 &= \frac{3(1 - b_{\min}^2)}{b_{\min}^2 (1 - \bar{a}_{\max}^2)^2 b_{\min} a_{\min}} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right) \\
+    c_1 &=  \frac{2}{b_{\min}^2 a_{\min}^2} \left(1 + \frac{1}{(1 - \bar{a}_{\max}^2) b_{\min}^2 a_{\min}^2} \right) \\
+    c_2 &= \frac{1}{(1 - \bar{a}_{\max}^2) b_{\min}^2 a_{\min}^2} \sqrt{\frac{3(1 - b_{\min}^2)}{b_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)} \\
+    c_3 &= \frac{3(1 - b_{\min}^2)}{(1 - \bar{a}_{\max}^2)^2 b_{\min}^4 a_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right) \\
     c_4 &= \frac{3(1 - b_{\min}^2)}{8b_{\min}^2 (1 - \bar{a}_{\max}^2)} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right),
 \end{align*}
 
 and $\varepsilon_{\max}$ is an upper bound on $\varepsilon_{ij}$ defined in Lemma \ref{lemma:varepsilon}.
 
-We apply Lemma \ref{lemma:KL_estimation} and simplify it to get
+Define $\bar{a}_i = \E{\tau}{\sqrt{\frac{\E{}{\lf_i \lf_j} \E{}{\lf_i \lf_k}}{\E{}{\lf_j \lf_k}}}}$ to be the asymptotic estimator with expectation over triplets. We apply Lemma \ref{lemma:KL_estimation} and simplify it to get
 \begin{align}
     \sum_{i = 1}^m \E{\N, \tau, Y}{\KL (\mathrm{Pr}_{\lf_i | Y} || \Ptilde_{\lf_i | Y} )} &= \sum_{i = 1}^m \Big(\frac{1 + a_i}{2} \log \Big(1 + \frac{a_i - \bar{a}_i}{1 + \bar{a}_i}\Big) + \frac{1 - a_i}{2} \log \Big(1 + \frac{\bar{a}_i - a_i}{1 - \bar{a}_i} \Big)\Big)  \label{eq:acc_decomposition}\\
     &+ \sum_{i = 1}^m \frac{a_i - \bar{a}_i}{1 - \bar{a}_i^2} \E{\N, \tau}{\bar{a}_i - \widetilde{a}_i } 
@@ -142,10 +137,17 @@ For $i \notin E_{\lf}$, we have that
 \begin{align}
     \bar{a}_i - a_i \in \bigg[\frac{-d \varepsilon_{\max}}{(m - 1)(m - 2) b_{\min}^2 a_{\min}^2}, \; \frac{-d \varepsilon_{\min} b_{\min}^2}{(m - 1)(m - 2)} \bigg]
 \end{align}
+
+\label{lemma:accuracy_bias}
 \end{lemma}
 
+And for all $i$, it is thus true that
+\begin{align}
+    |\bar{a}_i - a_i| \le \frac{\varepsilon_{\max}}{(m - 1)b_{\min}^2 a_{\min}^2}.
+\end{align}
+
 \begin{proof}
-We define $\varepsilon_{ij} = \E{}{\lf_i \lf_j} - \E{}{\lf_i Y} \E{}{\lf_j Y}$ for $(i, j) \in E_{\lf}$, i.e. the error we get from assuming conditional independence between $\lf_i$ and $\lf_j$. We define the exact value of $\varepsilon_{ij}$ in Lemma \ref{lemma:varepsilon}, and since all canonical parameters are assumed to be positive, we know that there exist $\varepsilon_{\min}, \varepsilon_{\max}$ that satisfy $0 \le \varepsilon_{\min} \le \varepsilon_{ij} \le \varepsilon_{\max}$ over the entire edgeset $E_{\lf}$. We now propagate this error to $\bar{a}_i$. Define $\bar{a}_i^{(j, k)}$ before we take the expectation over triplets as
+We define $\varepsilon_{ij} = \E{}{\lf_i \lf_j} - \E{}{\lf_i Y} \E{}{\lf_j Y}$ for $(i, j) \in E_{\lf}$, i.e. the error we get from assuming conditional independence between $\lf_i$ and $\lf_j$. We define the exact value of $\varepsilon_{ij}$ in Lemma \ref{lemma:varepsilon}, and since all canonical parameters are assumed to be positive, we know that there exist $\varepsilon_{\min}, \varepsilon_{\max}$ that satisfy $0 < \varepsilon_{\min} \le \varepsilon_{ij} \le \varepsilon_{\max}$ over the entire edgeset $E_{\lf}$. We now propagate this error to $\bar{a}_i$. Define $\bar{a}_i^{(j, k)}$ before we take the expectation over triplets as
 \begin{align*}
 \bar{a}_i^{(j, k)} := \sqrt{\frac{\E{}{\lf_i \lf_j} \E{}{\lf_i \lf_k}}{\E{}{\lf_j \lf_k}}} 
 \end{align*}
@@ -174,7 +176,7 @@ a_i - \bar{a}_i^{(j, k)} \in \Big[\frac{\varepsilon_{\min} b_{\min}^2}{2}, \frac
 \label{eq:acc_diff_jk}
 \end{align}
 
-Lastly, if none of $i, j, k$ share edges, $\bar{a}_i = a_i$. In our algorithm, we estimate each $a_i$ using $\lf_j$ and $\lf_k$ chosen uniformly at random from the other $m - 1$ labeling functions. We thus need to compute the probabilities that $(i, j), (i, k)$ and $(j, k)$ are in $E_{\lf}$. Note that these probabilities depend on if $i \in E_{\lf}$, which is true for $2d$ labeling functions. 
+Lastly, if none of $i, j, k$ share edges, $\bar{a}_i = a_i$. In our algorithm, we estimate each $a_i$ using $\lf_j$ and $\lf_k$ chosen uniformly at random from the other $m - 1$ sources. We thus need to compute the probabilities that $(i, j), (i, k)$ and $(j, k)$ are in $E_{\lf}$. Note that these probabilities depend on if $i \in E_{\lf}$, which is true for $2d$ sources. 
 \begin{align}
     &\Pr((i, j) \cup (i, k) \in E_{\lf} \; | \; i \notin E_{\lf}) = 0 \qquad \qquad \; \Pr((i, j) \cup (i, k) \in E_{\lf} \; | \; i \in E_{\lf}) = \frac{1(m - 2)}{{m - 1 \choose 2}} =  \frac{2}{m - 1} \nonumber \\
     &\Pr((j, k) \in E_{\lf} \;| \; i \notin E_{\lf}) = \frac{2d}{(m - 1)(m - 2)}  \quad \Pr((j, k) \in E_{\lf} \;| \; i \in E_{\lf}) = \frac{2(d - 1)}{(m - 1)(m - 2)} \nonumber
@@ -186,53 +188,53 @@ Therefore, if $i \in E_{\lf}$, we use \eqref{eq:acc_diff_ij} and \eqref{eq:acc_d
 \bar{a}_i - a_i &\ge \frac{2}{m - 1} \cdot \frac{\varepsilon_{\min} b_{\min}}{2} + \frac{2(d - 1)}{(m - 1)(m - 2)} \cdot \frac{-\varepsilon_{\max}}{2 b_{\min}^2 a_{\min}^2} = \frac{\varepsilon_{\min} b_{\min}}{m - 1} - \frac{(d - 1)\varepsilon_{\max}}{(m - 1)(m - 2)b^2_{\min} a^2_{\min}}
 \end{align*}
 
-Note that this lower bound can be negative in this case, so it is not clear if $\bar{a}_i$ or $a_i$ is bigger in expectation. However, if $\frac{d - 1}{m - 2} \le b_{\min} a_{\min}$, we have that $|\bar{a}_i - a_i| \le \frac{\varepsilon_{\max}}{(m - 1)b_{\min} a_{\min}}$ for $i \in E_{\lf}$. If $i \notin E_{\lf}$, using \eqref{eq:acc_diff_jk} then the expected error is bounded as
+Note that this lower bound can be negative in this case, so it is not clear if $\bar{a}_i$ or $a_i$ is bigger in expectation. 
+
+If $i \notin E_{\lf}$, using \eqref{eq:acc_diff_jk} then the expected error is bounded as
 \begin{align*}
 \bar{a}_i - a_i &\le \frac{2d}{(m - 1)(m - 2)} \cdot \frac{-\varepsilon_{\min} b_{\min}^2}{2} = \frac{-d\varepsilon_{\min} b_{\min}^2 }{(m - 1)(m - 2)}  \\
 \bar{a}_i - a_i &\ge \frac{2d}{(m - 1)(m - 2)}  \cdot \frac{-\varepsilon_{\max}}{2 b_{\min}^2 a_{\min}^2} = \frac{-d \varepsilon_{\max}}{(m - 1)(m - 2) b_{\min}^2 a_{\min}^2} 
 \end{align*}
 
-In this case, $\bar{a}_i \le a_i$. Finally, observe that if $\frac{d}{m - 2} \le b_{\min} a_{\min}$, the upper bound on $|\bar{a}_i - a_i|$ for $i \in E_{\lf}$ is greater than the upper bound on $|\bar{a}_i - a_i|$ for $i \notin E_{\lf}$.
-
+In this case, $\bar{a}_i \le a_i$. Finally, observe that regardless of if $i \in E_{\lf}$ or not, the absolute value of the bias is bounded by  
+\begin{align}
+    |\bar{a}_i - a_i| \le \frac{\varepsilon_{\max}}{(m - 1)b_{\min}^2 a_{\min}^2}.
+\end{align}
 \end{proof}
 
-We return to \eqref{eq:acc_decomposition}. Since $a_i \ge \bar{a}_i$ when $i \notin E_{\lf}$, we have that $\frac{1 + a_i}{2}\log(1 + \frac{a_i - \bar{a}_i}{1 + \bar{a}_i}) + \frac{1 - a_i}{2} \log (1 + \frac{\bar{a}_i - a_i}{1 - \bar{a}_i}) \le \frac{1 + a_i}{2} \log (1 + \max \frac{a_i - \bar{a}_i}{1 + \bar{a}_i})$ for $i \notin E_{\lf}$. On the other hand when $i \in E_{\lf}$, this expression can be upper bounded as $\frac{1+a_i}{2} \cdot \frac{a_i - \bar{a}_i}{1 + \bar{a}_i} + \frac{1 - a_i}{2} \frac{\bar{a}_i - a_i}{1 - \bar{a}_i} = \frac{(\bar{a}_i - a_i)^2}{1 - \bar{a}_i^2}$ using the inequality $\log(1 + x) \le x$ for $x > -1$ (it can b easily verified that $\frac{a_i - \bar{a}_i}{1 + \bar{a}_i}$ and $\frac{\bar{a}_i - a_i}{1 - \bar{a}_i}$ are at least $-1$). Since $|E_{\lf}| = 2d$ and $\varepsilon_{\max} \le 1$, the first summation of \eqref{eq:acc_decomposition} is bounded by 
+We return to \eqref{eq:acc_decomposition}. Since $a_i \ge \bar{a}_i$ when $i \notin E_{\lf}$, we have that $\frac{1 + a_i}{2}\log(1 + \frac{a_i - \bar{a}_i}{1 + \bar{a}_i}) + \frac{1 - a_i}{2} \log (1 + \frac{\bar{a}_i - a_i}{1 - \bar{a}_i}) \le \frac{1 + a_i}{2} \log (1 + \max \frac{a_i - \bar{a}_i}{1 + \bar{a}_i})$ for $i \notin E_{\lf}$. On the other hand when $i \in E_{\lf}$, this expression can be upper bounded as $\frac{1+a_i}{2} \cdot \frac{a_i - \bar{a}_i}{1 + \bar{a}_i} + \frac{1 - a_i}{2} \frac{\bar{a}_i - a_i}{1 - \bar{a}_i} = \frac{(\bar{a}_i - a_i)^2}{1 - \bar{a}_i^2}$ using the inequality $\log(1 + x) \le x$ for $x > -1$ (it can be easily verified that $\frac{a_i - \bar{a}_i}{1 + \bar{a}_i}$ and $\frac{\bar{a}_i - a_i}{1 - \bar{a}_i}$ are at least $-1$). Since $|E_{\lf}| = 2d$ and $\varepsilon_{\max} \le 1$, the first summation of \eqref{eq:acc_decomposition} is bounded by 
 \begin{align}
-    &(m - 2d) \log \left(1 + \frac{d\varepsilon_{\max}}{(m - 1)(m - 2) b_{\min}^2 a_{\min}^2 (1 + b_{\min})} \right) + 2d \frac{\varepsilon_{\max}^2}{(1 - \bar{a}_{\max}^2) (m - 1)^2 b_{\min}^2 a_{\min}^2} \\
-    \le &\frac{(m - 2d) d\varepsilon_{\max}}{(m - 1)(m - 2) b_{\min}^2 a_{\min}^2 (1 + b_{\min})} + \frac{2d \varepsilon_{\max}}{(1 - \bar{a}_{\max}^2) (m - 1)^2 b_{\min}^2 a_{\min}^2} \\
-    = & \frac{d\varepsilon_{\max}}{(m - 1)b_{\min}^2 a_{\min}^2} \left( \frac{m - 2d}{(m - 2)(1 + b_{\min})} + \frac{2}{(1 - \bar{a}_{\max}^2)(m - 1)}\right) \\
-    \le & \frac{d\varepsilon_{\max}}{(m - 1)b_{\min}^2 a_{\min}^2} \left(1 + \frac{1}{1 - \bar{a}_{\max}^2}\right) \le \frac{c_1 d \varepsilon_{\max}}{m},
+    &(m - 2d) \log \left(1 + \frac{d\varepsilon_{\max}}{(m - 1)(m - 2) b_{\min}^2 a_{\min}^2 (1 + b_{\min})} \right) + 2d \frac{\varepsilon_{\max}^2}{(1 - \bar{a}_{\max}^2) (m - 1)^2 b_{\min}^4 a_{\min}^4} \\
+    \le &\frac{(m - 2d) d\varepsilon_{\max}}{(m - 1)(m - 2) b_{\min}^2 a_{\min}^2 (1 + b_{\min})} + \frac{2d \varepsilon_{\max}}{(1 - \bar{a}_{\max}^2) (m - 1)^2 b_{\min}^4 a_{\min}^4} \\
+    = & \frac{d\varepsilon_{\max}}{(m - 1)b_{\min}^2 a_{\min}^2} \left( \frac{m - 2d}{(m - 2)(1 + b_{\min})} + \frac{2}{(1 - \bar{a}_{\max}^2)(m - 1) b_{\min}^2 a_{\min}^2}\right) \\
+    \le & \frac{d\varepsilon_{\max}}{(m - 1)b_{\min}^2 a_{\min}^2} \left(1 + \frac{1}{(1 - \bar{a}_{\max}^2) b_{\min}^2 a_{\min}^2}\right) \le \frac{c_1 d \varepsilon_{\max}}{m},
 \end{align}
 
-where $c_1 = \frac{2}{b_{\min}^2 a_{\min}^2} \left(1 + \frac{1}{1 - \bar{a}_{\max}^2} \right)$. Next, we bound $\sum_{i = 1}^m \frac{a_i - \bar{a}_i}{1 - \bar{a}_i^2} \E{\N, \tau}{\bar{a}_i - \widetilde{a}_i}$, using  our assumption that $\frac{d}{m - 2} \le b_{\min} a_{\min}$:
+where $c_1 = \frac{2}{b_{\min}^2 a_{\min}^2} \left(1 + \frac{1}{(1 - \bar{a}_{\max}^2) b_{\min}^2 a_{\min}^2} \right)$. Next, we bound $\sum_{i = 1}^m \frac{a_i - \bar{a}_i}{1 - \bar{a}_i^2} \E{\N, \tau}{\bar{a}_i - \widetilde{a}_i}$.
 \begin{align}
     \sum_{i = 1}^m \frac{a_i - \bar{a}_i}{1 - \bar{a}_i^2} \E{\N, \tau}{\bar{a}_i - \widetilde{a}_i} \le &\sum_{i = 1}^m \frac{|\bar{a}_i - a_i|}{1 - \bar{a}_i^2} \E{\N, \tau}{|\bar{a}_i - \widetilde{a}_i|} \\
-    \le &\frac{\sqrt{3}}{2\sqrt{n_U}} \cdot \sqrt{\frac{1 - b_{\min}^2}{b_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)} \frac{1}{1 - \bar{a}_{\max}^2} \left(\frac{m \varepsilon_{\max}}{(m - 1) b_{\min} a_{\min}}\right) \\
-    \le &\frac{c_2 \varepsilon_{\max}}{ \sqrt{n_U}},
+    \le &\frac{\sqrt{3}}{2\sqrt{n_U}} \cdot \sqrt{\frac{1 - b_{\min}^2}{b_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)} \frac{1}{1 - \bar{a}_{\max}^2} \left(\frac{m \varepsilon_{\max}}{(m - 1) b_{\min}^2 a_{\min}^2}\right) \le \frac{c_2 \varepsilon_{\max}}{ \sqrt{n_U}},
 \end{align}
 
-where $c_2 = \frac{1}{(1 - \bar{a}_{\max}^2) b_{\min} a_{\min}} \sqrt{\frac{3(1 - b_{\min}^2)}{b_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)}$. Lastly, we bound $\sum_{i = 1}^m \frac{1}{2}\Big( \frac{1}{1 - \bar{a}_i^2} + \frac{2\bar{a}_i(\bar{a}_i - a_i)}{(1 - \bar{a}_i^2)^2}\Big) \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}$, which can be split into an expression independent of misspecification and one dependent on it:
+where $c_2 = \frac{1}{(1 - \bar{a}_{\max}^2) b_{\min}^2 a_{\min}^2} \sqrt{\frac{3(1 - b_{\min}^2)}{b_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)}$. We bound $\sum_{i = 1}^m \frac{1}{2}\Big( \frac{1}{1 - \bar{a}_i^2} + \frac{2\bar{a}_i(\bar{a}_i - a_i)}{(1 - \bar{a}_i^2)^2}\Big) \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}$, which can be split into an expression independent of misspecification and one dependent on it:
 \begin{align}
-    \sum_{i = 1}^m \frac{1}{2}\Big( \frac{1}{1 - \bar{a}_i^2} + \frac{2\bar{a}_i(\bar{a}_i - a_i)}{(1 - \bar{a}_i^2)^2}\Big) \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2} \le \frac{c_4 m}{n_U} + \sum_{i = 1}^m \frac{\bar{a}_i - a_i}{(1 - \bar{a}_i^2)^2} \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2},
+    \sum_{i = 1}^m \frac{1}{2}\Big( \frac{1}{1 - \bar{a}_i^2} + \frac{2\bar{a}_i(\bar{a}_i - a_i)}{(1 - \bar{a}_i^2)^2}\Big) \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2} \le \frac{c_4 m}{n_U} + \sum_{i = 1}^m \frac{\bar{a}_i - a_i}{(1 - \bar{a}_i^2)^2} \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2}, \label{eq:variance_of_estimator}
 \end{align}
 
-where $c_4 = \frac{3(1 - b_{\min}^2)}{8b_{\min}^2 (1 - \bar{a}_{\max}^2)} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)$. The final summation is bounded as follows, again using the fact that $\bar{a}_i \le a_i$:
+where $c_4 = \frac{3(1 - b_{\min}^2)}{8b_{\min}^2 (1 - \bar{a}_{\max}^2)} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)$. The summation in \eqref{eq:variance_of_estimator} is bounded as follows, using the fact that $\bar{a}_i \le a_i$ for $i \notin E_{\lf}$:
 \begin{align}
     \sum_{i = 1}^m \frac{\bar{a}_i - a_i}{(1 - \bar{a}_i^2)^2} \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2} &\le \frac{3}{4 n_U} \cdot \frac{1 - b_{\min}^2}{b_{\min}^2 (1 - \bar{a}_{\max}^2)^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right) \sum_{i \in E_{\lf}} |\bar{a}_i - a_i | \\
-    &\le \frac{3}{4 n_U} \cdot \frac{1 - b_{\min}^2}{b_{\min}^2 (1 - \bar{a}_{\max}^2)^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right) \left(\frac{2d \varepsilon_{\max}}{(m - 1) b_{\min} a_{\min}}\right) \le \frac{c_3 d \varepsilon_{\max}}{m n_U},
+    &\le \frac{3}{4 n_U} \cdot \frac{1 - b_{\min}^2}{b_{\min}^2 (1 - \bar{a}_{\max}^2)^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right) \left(\frac{2d \varepsilon_{\max}}{(m - 1) b_{\min}^2 a_{\min}^2}\right) \le \frac{c_3 d \varepsilon_{\max}}{m n_U},
 \end{align}
 
-where $c_3 = \frac{3(1 - b_{\min}^2)}{b_{\min}^2 (1 - \bar{a}_{\max}^2)^2 b_{\min} a_{\min}} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)$. This concludes our proof.
+where $c_3 = \frac{3(1 - b_{\min}^2)}{(1 - \bar{a}_{\max}^2)^2 b_{\min}^4 a_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)$. This concludes our proof.
 
-\subsection{Proof of Proposition 1}
+\subsection{Proof of Proposition 1} \label{subsec:medians}
 
-To prove the ability of using the median of the accuracies to correct for misspecification, we first examine the asymptotic case. For $i \in E_{\lf}$, note that out of a total of ${m - 1 \choose 2}$ triplets, $m - 2$ of them will involve the edge $(i, j)\in E_{\lf}$, resulting in a higher inconsistent estimate of the accuracy. $d - 1$ of them will involve an edge $(j, k) \in E_{\lf}$, resulting in a lower estimate of the accuracy. Therefore, $\frac{(m - 1)(m - 2)}{2} - m - d - 3$ triplets are consistent. As long as ${m - 1 \choose 2} - (m - 2)$ is greater than the halfway point and $d - 1$ is less than the halfway point, then the median will be a consistent triplet. This gives us the conditions $m > 5$ and $d < \frac{(m - 1)(m - 2)}{4} - 1$.
+To prove the ability of using the median of the accuracies to correct for misspecification, we first examine the asymptotic case. For $i \in E_{\lf}$, note that out of a total of ${m - 1 \choose 2}$ triplets, $m - 2$ of them will involve the edge $(i, j)\in E_{\lf}$, resulting in a higher inconsistent estimate of the accuracy. $d - 1$ of them will involve an edge $(j, k) \in E_{\lf}$, resulting in a lower estimate of the accuracy. Therefore, $\frac{(m - 1)(m - 2)}{2} - m - d - 3$ triplets are consistent. As long as the ${m - 1 \choose 2} - (m - 2)$th largest triplet is greater than half of all the triplets, and the $d - 1$th largest triplet is less than the half of all the triplets, then the median will be a consistent triplet. This gives us the conditions $m > 5$ and $d < \frac{(m - 1)(m - 2)}{4}$.
 
 Next, for $i \notin E_{\lf}$, $d$ triplets will involve an edge $(j, k) \in E_{\lf}$, resulting in lower estimated accuracy, while the other ${m - 1 \choose 2} - d$ triplets are consistent. Therefore, as long as $d < \frac{(m - 1)(m - 2)}{4}$, the median triplet is consistent. 
 
-Lastly, we must consider the finite sample regime when the ordering of the accuracy estimates are perturbed by sampling noise. When each accuracy's expected sampling noise is less than half of the minimum standing bias, the order of the accuracies will not change on average. This translates into the inequality $\E{}{|\widetilde{a}_i - \bar{a}_i|} \le \frac{1}{2} \min_{(j, k)}|a_i - \bar{a}_i^{(j, k)}|$. The minimum standing bias is $\frac{\varepsilon_{\min} b_{\min}^2}{2}$, so this means that $n \ge n_0 \sim \Omega(1/\varepsilon_{\min}^2)$.
-
-\subsection{Proof of Corollary 1}
-
+Lastly, we must consider the finite sample regime when the ordering of the accuracy estimates are perturbed by sampling noise. When each accuracy's expected sampling noise is less than half of the minimum standing bias of a triplet, the order of the accuracies will not change on average. This translates into the inequality $\E{}{|\widetilde{a}_i - \bar{a}_i|} \le \frac{1}{2} \min_{(j, k)}|a_i - \bar{a}_i^{(j, k)}|$. The minimum standing bias is $\frac{\varepsilon_{\min} b_{\min}^2}{2}$, and $\E{}{|\widetilde{a}_i - \bar{a}_i|} \sim \mathcal{O}(1/\sqrt{n})$ so this means that $n_U \ge n_0 \sim \Omega(1/\varepsilon_{\min}^2)$.
 
 

@@ -1,5 +1,16 @@
 \section{Auxiliary Lemmas}
 
+\begin{lemma}
+For any source $\lf_i$ with accuracy $a_i = \E{}{\lf_i Y}$,
+\begin{align*}
+\Pr(\lf_i = 1 | Y = 1) &= \Pr(\lf_i = -1 | Y = -1) = \frac{1 + a_i}{2}  \\
+\Pr(\lf_i = -1 | Y = 1) &= \Pr(\lf_i = 1 | Y = -1) = \frac{1 - a_i}{2}.
+\end{align*}
+\label{lemma:fs_symmetry}
+\end{lemma}
+\begin{proof}
+By Proposition $2$ of \cite{fu2020fast}, we know that $\lf_i Y \independent Y$ for the binary Ising model we use, defined in section \ref{sec:background}. Intuitively, this means that the accuracy of a source is independent of the value of $Y$, and therefore $\Pr(\lf_i Y = 1 | Y = 1) = \Pr(\lf_i Y = 1) = \frac{1 + a_i}{2}$, since $\E{}{\lf_i Y} = 2 \Pr(\lf_i Y = 1) - 1$. Repeating this calculation with remaining configurations of $\Pr(\lf_i Y = \pm 1 | Y = \pm 1)$ concludes our proof.
+\end{proof}
 
 \begin{lemma}
 Define $a_i = \E{}{\lf_i Y},$ and let $\widetilde{a}_i$ be our estimated accuracy on $n$ points. Furthermore, let $\bar{a}_i$ be the expected asymptotic value of $\widetilde{a}_i$ over $\tau$.   %$\bar{a}_i = \E{\tau}{\sqrt{\frac{\E{}{\lf_i \lf_j} \E{}{\lf_i \lf_k}}{\E{}{\lf_j \lf_k}}}},$ and $\widetilde{a}_i = \sqrt{\frac{\Ehat{\lf_i \lf_j} \Ehat{\lf_i \lf_k}}{\Ehat{\lf_j \lf_k}}}$ estimated on $n$ points. 
@@ -20,7 +31,7 @@ As discussed previously, this term is equal to $-\E{(Y, \bm{\lf}), \N, \tau}{\lo
     \label{eq:estimation1}
 \end{align}
 
-Suppose $\lf_i \notin E_{\lf}$. Conditioning on the value of $\lf_i$ and using Lemma \textcolor{red}{CITE}, \eqref{eq:estimation1} becomes 
+Suppose $\lf_i \notin E_{\lf}$. Conditioning on the value of $\lf_i$ and using Lemma \ref{lemma:fs_symmetry}, \eqref{eq:estimation1} becomes 
 \begin{align*}
 &-\E{\bm{\lf}_{-i}, \N, \tau}{\E{\lf_i}{\Pr(Y = 1 | \bm{\lf}' = \bm{\lf}) \log \frac{\Ptilde(\lf_i' = \lf_i | Y = 1)}{\Pr(\lf_i' = \lf_i | Y = 1) }  + \Pr(Y = -1 | \bm{\lf}' = \bm{\lf}) \log \frac{\Ptilde(\lf_i' = \lf_i | Y = -1)}{\Pr(\lf_i' = \lf_i | Y = -1)} \Big| \bm{\lf}_{-i}}} \\
 = \;&-\mathbb{E}_{\bm{\lf}_{-i}, \N, \tau}\bigg[\big(\Pr(Y = 1 | \bm{\lf}_{-i}, \lf_i = 1) \Pr(\lf_i = 1 | \bm{\lf}_{-i}) + \Pr(Y = -1 | \bm{\lf}_{-i}, \lf_i = -1) \Pr(\lf_i = -1 | \bm{\lf}_{-i}) \big)\log \frac{1 + \widetilde{a}_i}{1 + a_i} \\
@@ -37,7 +48,7 @@ Now suppose that $\lf_i \in E_{\lf}$ and has an edge to some $\lf_j$. When we si
 
 Next, we evaluate $-\E{}{\log \frac{1 + \widetilde{a}_i}{1 + a_i}}$ and $-\E{}{\log \frac{1 - \widetilde{a}_i}{1 - a_i}}$, where expectation is over $\N$ and $\tau$. We apply a second-order Taylor approximation of $f(x) = \log \frac{1 + x}{1 + a_i}$ at $x = \bar{a}_i$:
 \begin{align*}
-\log \frac{1 + \widetilde{a}_i}{1 + a_i} \approx \log \frac{1 + \bar{a}_i}{1 + a_i} + \frac{1 + a_i}{1 + \bar{a}_i} \cdot \frac{1}{1 + a_i} (\widetilde{a}_i - \bar{a}_i) - \frac{1}{2(1 + \bar{a}_i)^2} (\widetilde{a}_i - \bar{a}_i)^2.
+\log \frac{1 + \widetilde{a}_i}{1 + a_i} \approx \log \frac{1 + \bar{a}_i}{1 + a_i} + \frac{1 + a_i}{1 + \bar{a}_i} \cdot \frac{1}{1 + a_i} (\widetilde{a}_i - \bar{a}_i) - \frac{1}{2(1 + \bar{a}_i)^2} (\widetilde{a}_i - \bar{a}_i)^2 + o(1/n).
 \end{align*}
 
 
@@ -50,7 +61,7 @@ where we have used Lemma \ref{lemma:taylor}.
 
 Similarly, we apply a second-order Taylor approximation of $f(x) = \log \frac{1 - x}{1 - a_i}$ at $x = \bar{a}_i$:
 \begin{align*}
-\log \frac{1 - \widetilde{a}_i}{1 - a_i} \approx \log \frac{1 - \bar{a}_i}{1 - a_i} + \frac{1 - a_i}{1 - \bar{a}_i} \cdot \frac{-1}{1 - a_i} (\widetilde{a}_i - \bar{a}_i) - \frac{1}{2(1 - \bar{a}_i)^2} (\widetilde{a}_i - \bar{a}_i)^2.
+\log \frac{1 - \widetilde{a}_i}{1 - a_i} \approx \log \frac{1 - \bar{a}_i}{1 - a_i} + \frac{1 - a_i}{1 - \bar{a}_i} \cdot \frac{-1}{1 - a_i} (\widetilde{a}_i - \bar{a}_i) - \frac{1}{2(1 - \bar{a}_i)^2} (\widetilde{a}_i - \bar{a}_i)^2 + o(1/n).
 \end{align*}
 
 Taking the expectation of both sides,
@@ -84,8 +95,7 @@ The remainder for $-\E{\N, \tau}{\log \frac{1 + \widetilde{a}_i}{1 + a_i}}$ is b
 
 For the labeled data case, it is easy to check that $\E{\N}{(\bar{a}_i - a_i)^3} \sim \mathcal{O}(1/n_L^2)$. Therefore, we focus on analyzing the unlabeled data case's estimator by bounding $\E{\N}{|\bar{a}_i - \widetilde{a}_i|^3 \; | \; \lf_j, \lf_k}$ independent of choice of $j$ and $k$. For ease of notation, define $X =\lf_i \lf_j$ and $Y = \lf_i \lf_k$, such that $XY = \lf_j \lf_k$, and let 
 \begin{align}
-    a := \bar{a}_i^{(j, k)} = \sqrt{  \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]}   } \\
-    \hat{a} := \widetilde{a}_i = \sqrt{  \frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]}   }
+    a := \bar{a}_i^{(j, k)} = \sqrt{  \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]}   }, \qquad \hat{a} := \widetilde{a}_i = \sqrt{  \frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]}   }.
 \end{align}
 
 Note $a \in [-1,1]$, so clip $\hat{a} \in [-1,1]$. Because $X \in \{-1,1\}$ and $\hat{\mathbb{E}}[X]$ is an i.i.d. sum of $n = n_U$ samples from $X$, we can apply Hoeffding's inequality to get:
@@ -100,9 +110,7 @@ The same is true for $\hat{\mathbb{E}}[Y]$ and $\hat{\mathbb{E}}[XY]$. Thus, by 
 
 Refer to the event $\left( |\hat{\mathbb{E}}[X] - \mathbb{E}[X]| \geq \epsilon \vee |\hat{\mathbb{E}}[Y] - \mathbb{E}[Y]| \geq \epsilon \vee |\hat{\mathbb{E}}[XY] - \mathbb{E}[XY]| \geq \epsilon \right)$ as $B$. If $\neg B$ and $\epsilon< \frac{1}{2} \min(\mathbb{E}[X], \mathbb{E}[Y], \mathbb{E}[XY]) < 1$, then
 \begin{align}
-    |\hat{\mathbb{E}}[X] - \mathbb{E}[X]| &< \epsilon \\
-    |\hat{\mathbb{E}}[Y] - \mathbb{E}[Y]| &< \epsilon \\
-    |\hat{\mathbb{E}}[XY] - \mathbb{E}[XY]| &< \epsilon
+    |\hat{\mathbb{E}}[X] - \mathbb{E}[X]| &< \epsilon, \quad|\hat{\mathbb{E}}[Y] - \mathbb{E}[Y]| < \epsilon, \quad |\hat{\mathbb{E}}[XY] - \mathbb{E}[XY]| < \epsilon
 \end{align}
 
 By the mean value theorem with $f(x) = \sqrt{x}$, there exists a $u$ between $\frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]}$ and $\frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]}$ such that 
@@ -145,29 +153,22 @@ Examining the right term in the max,
     &= \epsilon C_2 > 0
 \end{align}
 
-Combining the max argument bounds,
-\begin{align}
-    \left| \frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]} - \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \right| &\leq \epsilon \max(C_1, C_2) \\
-    &\leq \epsilon C_2
-\end{align}
-
-And thus,
+Combining the max argument bounds, we have that $ \left| \frac{\hat{\mathbb{E}}[X] \hat{\mathbb{E}}[Y]}{\hat{\mathbb{E}}[XY]} - \frac{\mathbb{E}[X] \mathbb{E}[Y]}{\mathbb{E}[XY]} \right| \leq \epsilon \max(C_1, C_2) \leq \epsilon C_2$. Therefore, 
 \begin{align}
     | \hat{a} -  a | &\leq \epsilon \frac{\sqrt{2}C_2}{\sqrt{\mathbb{E}[X] \mathbb{E}[X]}} = \epsilon C_3
 \end{align}
 
 where $C_3$ is a positive function of $\mathbb{E}[X]$, $\mathbb{E}[Y]$, and $\mathbb{E}[XY]$. To recap, this is satisfied if $\neg B$ and $\epsilon$ is small. Let $\epsilon = n^{-3/8}$, thus for large enough $n$, $\epsilon$ is smaller than any constant. Recall, $\Pr(B) \leq 6 \exp( - n \epsilon^2 / 2)$. With this definition of $\epsilon$, $\Pr(B) \leq 6 \exp(-n^{1/4}/2)$.
 
-Now, we are finally ready to evaluate the limit,
+Now, we are finally ready to evaluate the limit:
 \begin{align}
     \lim_{n \rightarrow \infty} n \mathbb{E}[ |\hat{a} - a|^3 ] &= \lim_{n \rightarrow \infty} n \left( \mathbb{E}[ |\hat{a} - a|^3 | B] \Pr(B) + \mathbb{E}[ |\hat{a} - a|^3 | \neg B] P(\neg B) \right) \\
     &\leq \lim_{n \rightarrow \infty} n \left(C_3^3 \epsilon^3 \cdot 1 + 2^3 \cdot 6\exp(-n^{1/4}/2) \right) \\
     &= C_3^3 \lim_{n \rightarrow \infty} n (n^{-3/8})^3 + 48 \lim_{n \rightarrow \infty} n \exp(-n^{1/4}/2) \\
-    &= C_3^3 \lim_{n \rightarrow \infty} n^{-1/8} + 48 \lim_{m \rightarrow \infty} m^4 \exp(-m/2) \\
-    &= 0
+    &= C_3^3 \lim_{n \rightarrow \infty} n^{-1/8} + 48 \lim_{m \rightarrow \infty} m^4 \exp(-m/2) = 0
 \end{align}
 
-Trivially, $\lim_{n \rightarrow \infty} n \mathbb{E}[ |\hat{a} - a|^3 ] \geq 0$. Thus, $\lim_{n \rightarrow \infty} n \mathbb{E}[ |\hat{a} - a|^3 ] = 0$
+Trivially, $\lim_{n \rightarrow \infty} n \mathbb{E}[ |\hat{a} - a|^3 ] \geq 0$. Thus, $\lim_{n \rightarrow \infty} n \mathbb{E}[ |\hat{a} - a|^3 ] = 0$.
 \end{proof}
 
 
@@ -189,8 +190,7 @@ where
     z_{ij}' &=  \sum_{{s_i, s_j}} \exp(s_i \theta_i + s_j \theta_j)
 \end{align}
 
-
-Note that $\Delta_{ij} \ge 0$ as long as $\theta_{ij} \ge 0$, and $\Delta_i, \Delta_j \ge 0$ as long as $\sign{\theta_{ij}} = \sign{\theta_j}$ and $\sign{\theta_{ij}} = \sign{\theta_i}$ respectively. As a result, $\varepsilon \ge 0$.
+Using these values, it is also possible to verify that $\varepsilon_{ij} \in (0, 1)$ if $\theta_i, \theta_j, \theta_{ij} > 0$.
 
 \label{lemma:varepsilon}
 
@@ -206,7 +206,7 @@ We define a new distribution, which we denote by $\Pr'$ and $\mathbb{E}'$:
 
 This distribution uses all the same canonical parameters as \eqref{eq:true_pgm} except $\theta_{ij} \lf_i \lf_j$. We know that for this distribution, $\Eprime{}{\lf_i \lf_j} = \Eprime{}{\lf_i Y} \Eprime{}{\lf_j Y}$. Our approach to compute $\varepsilon_{ij} = \E{}{\lf_i \lf_j} - \E{}{\lf_i Y} \E{}{\lf_j Y}$ is to bound the differences between $\mathbb{E}$ and $\mathbb{E}'$. 
 
-First, we evaluate $\E{}{\lf_i Y} - \E{}{\lf_j Y}$. We write $\E{}{\lf_i Y}$ as $2\Pr(\lf_i Y = 1) - 1 = \frac{2}{p} \Pr(\lf_i = 1, Y = 1) - 1$ and $\Eprime{}{\lf_i Y}$ as $\frac{2}{p} \Pr'(\lf_i = 1, Y = 1) - 1$  by Lemma \todo{CITE}, where $p = \Pr(Y = 1).$ Then, letting $s_{-i}$ represent all combinations of labels on all $\bm{\lf}$ besides $\lf_i$,
+First, we evaluate $\E{}{\lf_i Y} - \E{}{\lf_j Y}$. We write $\E{}{\lf_i Y}$ as $2\Pr(\lf_i Y = 1) - 1 = \frac{2}{p} \Pr(\lf_i = 1, Y = 1) - 1$ and $\Eprime{}{\lf_i Y}$ as $\frac{2}{p} \Pr'(\lf_i = 1, Y = 1) - 1$  by Lemma \ref{lemma:fs_symmetry}, where $p = \Pr(Y = 1).$ Then, letting $s_{-i}$ represent all combinations of labels on all $\bm{\lf}$ besides $\lf_i$,
 \begin{align}
     \Delta_i &= \E{}{\lf_i Y} - \Eprime{}{\lf_i Y} = \frac{2}{p} \sum_{s_{-i}} \exp \bigg(\theta_Y + \theta_i + \sum_{k \neq i} \theta_k l_k + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l \bigg) \left(\frac{\exp(\theta_{ij} l_j)}{Z} - \frac{1}{Z'} \right)
 \end{align}
@@ -224,7 +224,7 @@ $\frac{\exp(\pm \theta_{ij})}{z_Y} - \frac{1}{z_Y'}$ can be written as $\frac{1}
     &\times \big(\exp(\theta_i + \theta_j) (\exp(\theta_i - \theta_j) + \exp(-\theta_i + \theta_j)) - \exp(\theta_i - \theta_j) (\exp(\theta_i + \theta_j) +\exp(-\theta_i - \theta_j)) \big)
 \end{align}
 
-The second line simplifies $\exp(2\theta_i) + \exp(2\theta_j) - \exp(2\theta_i) - \exp(-2\theta_j) = \exp(2\theta_j) - \exp(-2\theta_j)$. Lastly, note that $z_Y = \sum_{s_{-i, j}} \exp \Big(\theta_Y + \sum_{k \neq i, j} \theta_k l_k + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l\Big) \cdot \sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j + s_i s_j \theta_{ij})$, and $z_Y' = \sum_{s_{-i, j}} &\exp \Big(\theta_Y + \sum_{k \neq i, j} \theta_k l_k + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l\Big) \cdot \sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j)$. Canceling out the summations over the other labeling functions, we have our desired expression for $\Delta_i$. We can do the same to get our result for $\Delta_j$.
+The second line simplifies $\exp(2\theta_i) + \exp(2\theta_j) - \exp(2\theta_i) - \exp(-2\theta_j) = \exp(2\theta_j) - \exp(-2\theta_j)$. Lastly, note that $z_Y = \sum_{s_{-i, j}} \exp \Big(\theta_Y + \sum_{k \neq i, j} \theta_k l_k + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l\Big) \cdot \sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j + s_i s_j \theta_{ij})$, and $z_Y' = \sum_{s_{-i, j}} \exp \Big(\theta_Y + \sum_{k \neq i, j} \theta_k l_k + \sum_{(k, l) \neq (i, j)} \theta_{kl} s_k s_l\Big) \cdot \sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j)$. Canceling out the summations over the other sources, we have our desired expression for $\Delta_i$. We can do the same to get our result for $\Delta_j$.
 
 Next, we compute $\Delta_{ij} = \E{}{\lf_i \lf_j} - \Eprime{}{\lf_i \lf_j},$ which is equal to $2(\Pr(\lf_i = 1, \lf_j = 1) - \Pr'(\lf_i = 1, \lf_j = 1) + \Pr(\lf_i = -1, \lf_j = -1) - \Pr'(\lf_i = -1, \lf_j = -1))$:
 \begin{align}
@@ -246,7 +246,7 @@ We can write $\frac{\exp(\theta_{ij})}{Z} - \frac{1}{Z'}$ as $\frac{1}{Z' Z} \su
 Note that $Z = \sum_{Y, s_{-i, j}} \exp(\theta_Y Y + \sum_{k \neq i, j} \theta_k s_k Y + \sum_{(k, l) \in (i, j)} \theta_{kl} s_k s_l) \sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j + s_i s_j \theta_{ij})$ and $Z' = \sum_{Y, s_{-i, j}} \exp(\theta_Y Y + \sum_{k \neq i, j} \theta_k s_i Y + \sum_{(k, l) \in (i, j)} \theta_{kl} s_k s_l) \sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j)$. Plugging this back in and canceling out summations, we obtain our desired result for $\Delta_{ij}$.
 
 
-We now can compute $\varepsilson_{ij}$:
+We now can compute $\varepsilon_{ij}$:
 \begin{align}
     \varepsilon_{ij} &= \E{}{\lf_i \lf_j} - \E{}{\lf_i Y} \E{}{\lf_j Y} = \Eprime{}{\lf_i \lf_j} + \Delta_{ij} - (\Eprime{}{\lf_i Y} + \Delta_i)(\Eprime{}{\lf_j Y} + \Delta_j) \\
     &= \Delta_{ij} - \Delta_i \Eprime{}{\lf_j Y} - \Delta_j \Eprime{}{\lf_i Y} - \Delta_i \Delta_j
@@ -266,11 +266,17 @@ $Z'$ can be written as $\sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j) \sum_{
     \Eprime{}{\lf_i Y} &= \frac{2 \exp(\theta_i) (\exp(\theta_j) + \exp(-\theta_j))}{\sum_{s_i, s_j} \exp(s_i \theta_i + s_j \theta_j)} - 1
 \end{align}
 
+The key takeaways from this Lemma are:
+\begin{enumerate}
+    \item Impact of misspecification in our computations exhibits some form of Lipschitzness, i.e. it is bounded in terms of the canonical parameters of our distribution. 
+    \item One misspecified edge only contributes error defined in terms of the canonical parameters on the two vertices and the unmodeled edge between them.
+    \item Under our assumptions, $\varepsilon_{ij} > 0$.
+\end{enumerate}
+
 \end{proof}
 
 
-\begin{lemma}
-
+\begin{lemma} In the case of unlabeled data, accuracies estimated using the triplet method in \eqref{eq:triplet} satisfy
 \begin{align*}
 \E{\N, \tau}{\widetilde{a}_i - \bar{a}_i} &\le \frac{\sqrt{3}}{2\sqrt{n_U}} \cdot \sqrt{\frac{1 - b_{\min}^2}{b_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)}\\
 \E{\N, \tau}{(\widetilde{a}_i - \bar{a}_i)^2} &\le \frac{3}{4 n_U} \cdot \frac{1 - b_{\min}^2}{b_{\min}^2} \left(\frac{1}{b_{\min}^4} + \frac{2}{b_{\min}^2} \right)

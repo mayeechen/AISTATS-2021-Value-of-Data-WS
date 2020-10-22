@@ -1,10 +1,11 @@
 \section{Background and Problem Setting} \label{sec:background}
-
-We start with background on latent variable models and introduce the model we analyze. We explain the stages---learning accuracies and aggregating sources---for both the labeled and unlabeled cases, and conclude with model evaluation and key challenges.
+\vspace{-.5em}
+We start with background on latent variable models and introduce the model we analyze. We explain the stages---learning accuracies and inferring labels---for both the labeled and unlabeled cases, and conclude with model evaluation and key challenges.
 
 \begin{figure*}
     \centering
-    \includegraphics[width=.7\textwidth]{figures/models.pdf}
+    \hspace*{-.5cm}\includegraphics[width=.7\textwidth]{figures/models.pdf}
+    % \hspace*{-.6cm}\includegraphics[width=.525\textwidth]{figures/models.pdf}
     %
     \caption{Latent variable models with unmodeled dependency (red edge), leading to misspecification. Boxes indicate observable variables used for accuracy estimation. Left: model with access to label $Y$. Pairs $(\lambda_i, Y)$ directly estimate source accuracy. Center: latent model with unobserved $Y$. Triplet (red) includes unmodeled dependency, leading to inconsistent estimation. Right: Corrected model using medians. Triplet excludes the dependency, returning to consistency.}
     \label{fig:biases}
@@ -20,17 +21,18 @@ We start with background on latent variable models and introduce the model we an
 \paragraph{Setup} In latent variable models, a number of sources are observed and used to infer the latent variable.
 %In weak supervision frameworks, e.g., data programming \citep{Ratner16}, a labeled dataset is built by acquiring noisy sources operating on unlabeled data. %The outputs of these sources %. Often a programmatic heuristic written by practitioners, each weak source either votes or abstains on a data point, thus overall producing multiple noisy labels per point that are then
 %are aggregated by a \emph{label model} to output the training label for each point. 
-The usual input is a supply of $n_U$ unlabeled data points; in our setting, we also consider a small \emph{labeled} dataset of $n_L$ samples. The output is a large, labeled dataset.
+The input is usually $n_U$ unlabeled data points, but in our setting we also consider a small \emph{labeled} dataset of $n_L$ samples. The output is a large, labeled dataset.
 
-Let $X \in \X$ and $Y \in \mathcal{Y} = \{-1, 1\}$ with $(X, Y)$ from some distribution $\D$. We consider an unlabeled dataset $\bm{X}_U = \{x_i^U\}_{i = 1}^{n_U}$ and a labeled dataset $(\bm{X}_L, \bm{Y}_L) = \{(x_i^L, y_i^L) \}_{i = 1}^{n_L}$ drawn from $\D$.
-There are $m$ weak sources, each
-voting on $X$ via a deterministic \textit{labeling function} (LF)
-$\lf_j: \X \rightarrow \mathcal{Y} \cup \{0\}$ for all
-$j = 1, \dots, m$ ($\lf_j(X) = 0$ is an abstain). 
-For each $X$, our goal is to use the outputs of $\bm{\lf}$, the vector of LFs, to construct a model to infer $Y$.
+Let $X \in \X$ and $Y \in \mathcal{Y} = \{-1, 1\}$. We consider an unlabeled dataset $\bm{X}_U = \{x_i^U\}_{i = 1}^{n_U}$ and a labeled dataset $(\bm{X}_L, \bm{Y}_L) = \{(x_i^L, y_i^L) \}_{i = 1}^{n_L}$ drawn from the distribution of $(X, Y)$.
+There are $m$ sources, each
+outputting a value in $\{-1, +1\}$ via a deterministic function
+%on $X$ via a deterministic \textit{labeling function} (LF)
+$\lf_j: \X \rightarrow \mathcal{Y}$ for all
+$j \in [m]$. % ($\lf_j(X) = 0$ is an abstain). 
+Our goal is to use the outputs of $\bm{\lf}$, the vector of sources, to construct a model to infer $Y$.
 
-To infer $Y$ we learn the model $\Pr(Y, \bm{\lf})$. We can marginalize to produce soft labels $\widetilde{y}_i := 2 \Pr(Y = 1 | \bm{\lf} = \bm{\lf}(x_i)) - 1 \in [-1, 1]$ for each $x_i$ by applying
-the $m$ sources to $\bm{X}_U$ and $(\bm{X}_L, \bm{Y}_L)$. The overall approach is thus a two-step process: (i) learn the model (using labeled or unlabeled data), and (ii) compute $\tilde{y}_i$ for unlabeled points.
+To infer $Y$, we learn the model $\Pr(Y, \bm{\lf})$ and then marginalize to produce soft labels $\widetilde{y}_i := 2 \Pr(Y = 1 | \bm{\lf} = \bm{\lf}(x_i)) - 1 \in [-1, 1]$ for each $x_i$ by applying
+the $m$ sources to $\bm{X}_U$ and $(\bm{X}_L, \bm{Y}_L)$. The overall approach has two steps: (i) learn the latent variable model (using labeled or unlabeled data), and (ii) infer labels $\tilde{y}_i$.
 
 %We use the label model outputs as the final predictions for $Y$ such that its generalization error precisely captures the effect of model misspecification and labeled versus unlabeled data. However, the labels are often used to train an additional end model, for which our analysis on the quality of training data is still valid.
 
@@ -38,69 +40,67 @@ the $m$ sources to $\bm{X}_U$ and $(\bm{X}_L, \bm{Y}_L)$. The overall approach i
 % To learn the joint distribution $\Pr(Y,\bm{\lf})$, we typically assume that there exist subsets of labeling functions that are conditionally independent given $Y$. When 
 
 \paragraph{Theoretical model}
-We pick a simple theoretical model that captures many latent variable model settings and still presents all of the challenges for comparing between the types of data. We assume an Ising model for $\Pr(Y, \bm{\lf})$; the only difference between the labeled and unlabeled setting is that $Y$ is latent in the latter. %Following the standard notation,
+We pick a simple model that captures many latent variable model settings and still presents all of the challenges for comparing between the types of data. We assume an Ising model for $\Pr(Y, \bm{\lf})$; the only difference between the labeled and unlabeled setting is that $Y$ is latent in the latter. %Following the standard notation,
 %We present the standard graphical model assumptions for the true distribution $\Pr(Y, \bm{\lf})$. Then, we discuss the misspecified graphical model used in weak supervision and how it outputs labels.
-The set of canonical parameters is $\Theta$, and the dependency graph is $G = (V, E)$, where $V = Y \cup \bm{\lf}$ and $E$ consists of edges from $Y$ to the labeling functions as well as the $d$ edges among the labeling functions, $E_{\lf}$. %The graph $G$ specifies dependencies using standard technical notions from the PGM literature~\citep{koller2009probabilistic, Lauritzen, wainwright2008graphical}. 
-Recall that the lack of an edge in $G$ between a pair of
-variables indicates independence conditioned on a separator set of
-variables~\citep{Lauritzen}, so the true distribution can be modeled as
+The set of canonical parameters is $\Theta$, and the dependency graph is $G = (V, E)$, where $V = Y \cup \bm{\lf}$ and $E$ consists of edges from $Y$ to the sources as well as the $d$ edges among the sources, $E_{\lf}$. %The graph $G$ specifies dependencies using standard technical notions from the PGM literature~\citep{koller2009probabilistic, Lauritzen, wainwright2008graphical}. 
+The lack of an edge in $G$ between a pair of
+variables indicates independence conditioned on a separator set~\citep{Lauritzen}, so the true distribution can be modeled as
 \begin{align}
     \Pr(Y, \bm{\lf}) = \frac{1}{Z} \exp \Big(\theta_Y + \sum_{i = 1}^m \theta_i \lf_i Y + \sum_{(i, j) \in E_{\lf}} \theta_{ij} \lf_i \lf_j \Big),
     \label{eq:true_pgm} \nonumber 
+    \vspace{-0.5em}
 \end{align}
-with cumulant function $Z$. For cleaner presentation, we assume that $\Theta \ge 0$ (i.e. no LFs that disagree with other LFs or $Y$ on average) and $E_{\lf}$ is sparse enough such that $\text{deg}(\lf_i) \le 2$ for all $\lf_i$, e.g. each LF is conditionally dependent on at most one other LF. This leads to model misspecification when edges are unknown.
+with cumulant function $Z$. For cleaner presentation, we assume $\Theta \ge 0$ (no sources that disagree with others or $Y$ on average) and $E_{\lf}$ is sparse enough such that $\text{deg}(\lf_i) \le 2$ for all $\lf_i$ (each source is conditionally dependent on at most one other source). This leads to model misspecification when edges are unknown.
 
 %With this, we can explain the two steps involved in the process.
 
-\paragraph{Inference} The label is computed using a naive Bayes approach that assumes all labeling functions are conditionally independent with $E_{\lf} = \emptyset$:
+\paragraph{Inference} The label is computed using a naive Bayes approach that assumes all sources are conditionally independent with $E_{\lf} = \emptyset$:
 \begin{align}
     \widetilde{\Pr}(Y &= 1 | \lf = \lf(X)) \nonumber \\
     &= \frac{\prod_{i = 1}^m \widetilde{\Pr}(\lf_i = \lf_i(X) | Y = 1) \Pr(Y = 1)}{\hat{\Pr}(\lf = \lf(X))} 
     \label{eq:inference}
 \end{align}
 where the class balance $\Pr(Y = 1)$ is assumed to be known, $\hat{\Pr}$ is an empirical probability
-%\bcw{This still makes me a little uncomfortable. You'd never use the empirical counts of $\lambda$ in practice, because the number of times a particular set of labeling function outputs appears decays exponentially with $m$, which means our estimates will be pretty terrible. Not sure what can be done about this though, given that the error decomposition seems like it leans on this expression for the probabilistic label pretty heavily.}
 , and $\widetilde{\Pr}$ indicates an estimated probability resulting from the parameter estimation step described below. %The class balance $\Pr(Y = 1)$ is assumed to be known, so the only term to be estimated is $\widetilde{\Pr}(\lf_i = \lf_i(X) | Y = 1)$ for each $\lf_i$, which we describe how to do below. 
 %
-In practice, the conditional independence assumptions required for (\ref{eq:inference}) may not hold, but dependencies among labeling functions are often unknown%\footnote{We discuss techniques to rectify this and their costs at the end of the following section.}
-. Therefore, conditional independence is assumed---and so we may suffer from \emph{misspecification} in inferring our probabilistic labels. %In the following we compute the cost of this error and its implications for the value of data. 
+In practice, the conditional independence assumptions required for (\ref{eq:inference}) may not hold, but dependencies among sources are often unknown%\footnote{We discuss techniques to rectify this and their costs at the end of the following section.}
+. Therefore, conditional independence is assumed, and we may suffer from \emph{misspecification} in inferring our probabilistic labels. %In the following we compute the cost of this error and its implications for the value of data. 
 
 %Note that in the case of labeled data, we can compute this directly, but for unlabeled data, we estimate this probability using the graphical model structure.
 
-\paragraph{Learning the latent variable model with method-of-moments}
-For the labeled dataset, we can estimate $\widetilde{\Pr}(\lf_i = \lf_i(X) | Y = 1)$ in (\ref{eq:inference}) directly from samples, as $Y$ is observed. 
+\paragraph{Learning parameters with method-of-moments}
+For the labeled dataset, we estimate $\widetilde{\Pr}(\lf_i = \lf_i(X) | Y = 1)$ in (\ref{eq:inference}) directly from samples, as $Y$ is observed. 
 
-In the unlabeled case, we use the method-of-moments estimator, as in \cite{fu2020fast}, which relies on the property
+For the unlabeled dataset, we use the method-of-moments estimator from \cite{fu2020fast}, which relies on the property
 %\begin{proposition} 
 that if $\lf_i \independent \lf_j | Y$, then $\lf_i Y \independent \lf_j Y$.
 %\label{prop:triplet}
 %\end{proposition}
 %
 This implies that $\E{}{\lf_i Y} \cdot \E{}{\lf_j Y} = \E{}{\lf_i \lf_j Y^2} = \E{}{\lf_i \lf_j},$ which is directly estimable.
-Define $a_i := \E{}{\lf_i Y}$ as the unknown \textit{accuracy} of $\lf_i$. If we can introduce a third $\lf_k$ that is conditionally independent of $\lf_i$ and $\lf_j$, we have a system of equations that can be solved using observable rates of agreement among LFs. We thus use this \textit{triplet method} to recover these accuracies; in particular, this is a method-of-moments approach in which we choose two $\lf_j$, $\lf_k$ at random for each $\lf_i$ and solve up to sign:
+Define $a_i := \E{}{\lf_i Y}$ as the unknown \textit{accuracy} of $\lf_i$. If we can introduce a third $\lf_k$ that is conditionally independent of $\lf_i$ and $\lf_j$, we have a system of equations that can be solved using observable statistics. We use this \textit{triplet method} to recover these accuracies: we choose two $\lf_j$, $\lf_k$ at random for each $\lf_i$ and solve up to sign:
 \begin{align}
     |\widetilde{a}_i^{(j, k)}| := \sqrt{\bigg| \frac{\Ehat{\lf_i \lf_j} \Ehat{\lf_i \lf_k}}{\Ehat{\lf_j \lf_k}} \bigg|},
     \label{eq:triplet}
 \end{align}
-where $\hat{\mathbb{E}}$ represents empirical estimates of the expectations %using the weakly labeled dataset $\bm{X}_U$. 
-We then use the estimated $\widetilde{a}_i^{(j, k)}$ to directly compute $\widetilde{\Pr}(\lf_i = \pm 1 | Y = 1)$ for \eqref{eq:inference}. However, randomly choosing $\lf_j$ and $\lf_k$ may not satisfy conditional independence, and thus we incur further error in estimating accuracies due to misspecification---in a way unique to the unlabeled setting. We aim to capture this error in our evaluation. % The following section characterizes this notion.
+where $\hat{\mathbb{E}}$ is an empirical estimate of the expectation. %using the weakly labeled dataset $\bm{X}_U$. 
+We use the estimated $\widetilde{a}_i^U := \widetilde{a}_i^{(j, k)}$ to directly compute $\widetilde{\Pr}(\lf_i = \pm 1 | Y = 1)$ for \eqref{eq:inference}. However, random $\lf_j$ and $\lf_k$ may not satisfy conditional independence, and thus we incur error in estimating accuracies due to misspecification in a way unique to the unlabeled setting. We aim to capture this error in our evaluation. % The following section characterizes this notion.
 
 \paragraph{Evaluating the model}
-We define the model's generalization error as $R = \mathbb{E}_{(Y, \bm{\lf}), \N, \tau}[l(\widetilde{Y}, Y)]$ where expectation is taken over the distribution of $(Y, \bm{\lf})$, $\N$ (the random dataset used), and $\tau$ (the algorithmic randomness, i.e. the triplets used in method-of-moments). $l(\cdot, \cdot)$ here is the cross entropy loss 
-%\steve{maybe move this up to the beginning of the paragraph, so the ordering is more natural?}
-, defined on a point $(x_i, y_i)$ as
+We define the model's generalization error as $R = \mathbb{E}_{(Y, \bm{\lf}), \N, \tau}[l(\widetilde{Y}, Y)]$ where expectation is taken over the distribution of $(Y, \bm{\lf})$, $\N$ (the random dataset used), and $\tau$ (the algorithmic randomness, i.e. the triplets used in method-of-moments). $l(\cdot, \cdot)$ here is the cross entropy loss,
+%\steve{maybe move this up to the beginning of the paragraph, so the ordering is more natural?}  defined on a point $(x_i, y_i)$ as
 $l(\widetilde{y}_i, y_i) = -\frac{1 + y_i}{2} \log \widetilde{\Pr}(Y = 1 | \lf = \lf(x_i))
 - \frac{1 - y_i}{2} \log \widetilde{\Pr}(Y = -1 | \lf = \lf(x_i)).$
-We let $R_U$ denote the error for the weakly-labeled dataset and $R_L$ for labeled.
+Let $R_U$ denote the error for the unlabeled dataset and $R_L$ for labeled.
 
-\paragraph{Key Technical Challenges}
-The goal of our evaluation framework is to answer questions such as
-\begin{itemize}
-  \setlength\itemsep{0em}
-    \item The weakly labeled case computes the function (\ref{eq:triplet}) of empirically observable quantities, while the labeled case accesses them directly---how do the errors due to sampling noise compare? 
-    \item Which stage of the pipeline---learning the model and inference---does misspecification impact, and how does this differ between the cases?
-    %\item How to price $n_L$ labeled samples in terms of the cheaper weakly labeled ``currency''?
-\end{itemize}
+% \paragraph{Key Technical Challenges}
+% The goal of our evaluation framework is to answer questions such as
+% \begin{itemize}
+%   \setlength\itemsep{0em}
+%     \item The weakly labeled case computes the function (\ref{eq:triplet}) of empirically observable quantities, while the labeled case accesses them directly---how do the errors due to sampling noise compare? 
+%     \item Which stage of the pipeline---learning the model and inference---does misspecification impact, and how does this differ between the cases?
+%     %\item How to price $n_L$ labeled samples in terms of the cheaper weakly labeled ``currency''?
+% \end{itemize}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
