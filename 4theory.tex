@@ -42,10 +42,16 @@ an exact decomposition of the generalization error of the latent variable model,
 Our first result is a decomposition of the generalization error into four components. The last two components, the inference bias and parameter estimation error, reflect the role of misspecification.
 \begin{theorem}
 The generalization error has the following decomposition:
+\ifsinglecolumn
+\begin{align}
+    &\E{}{l(\widetilde{Y}, Y)} = \underbrace{H(Y | \bm{\lf})}_{{\mathrm{Irreducible \; error}}} - \underbrace{\E{\N}{\KL(\Pr(\bm{\lf}) || \hat{\Pr}(\bm{\lf}))}}_{\mathrm{Observable \; sampling \; noise}} + \sum_{{(i, j) \in E_{\lf}}} \underbrace{I(\lf_i; \lf_j | Y)}_{\mathrm{Inference \; bias}} +  \sum_{i = 1}^m \underbrace{\E{Y, \N, \tau}{\KL(\mathrm{Pr}_{\lf_i | Y} || \widetilde{\Pr}_{\lf_i | Y })}}_{\mathrm{Parameter \;estimation \;error}} \nonumber,
+\end{align}
+\else 
 \begin{align}
     &\E{}{l(\widetilde{Y}, Y)} = \underbrace{H(Y | \bm{\lf})}_{\mathclap{\mathrm{Irreducible \; error}}} - \underbrace{\E{\N}{\KL(\Pr(\bm{\lf}) || \hat{\Pr}(\bm{\lf}))}}_{\mathrm{Observable \; sampling \; noise}} + \nonumber \\ %\E{}{\frac{1 + a}{2} \log \frac{1 + \widetilde{a}}{1 + a}  + \frac{1 - a}{2} \log \frac{1 - \widetilde{a}}{1 - a} } - \nonumber \label{eq:decomposition} \\
     &\sum_{\mathclap{(i, j) \in E_{\lf}}} \;\;\; \underbrace{I(\lf_i; \lf_j | Y)}_{\mathrm{Inference \; bias}} +  \sum_{i = 1}^m \underbrace{\E{Y, \N, \tau}{\KL(\mathrm{Pr}_{\lf_i | Y} || \widetilde{\Pr}_{\lf_i | Y })}}_{\mathrm{Parameter \;estimation \;error}} \nonumber,
 \end{align}
+\fi
 
 where $I(\lf_i; \lf_j | Y)$ is the conditional mutual information between sources and $H(Y|\bm{\lf})$ is conditional entropy. $\Pr$ refers to the true data distribution, while $\hat{\mathrm{Pr}}$ and $\widetilde{\mathrm{Pr}}$ refer to the estimated probabilities in \eqref{eq:inference}.
 
@@ -99,10 +105,16 @@ is in the Appendix.
 %be bounds on the value of $\E{}{\lf_i \lf_j} - \E{}{\lf_i Y} \E{}{\lf_j Y}$ over all pairs $(\lf_i, \lf_j)$ in terms of the canonical parameters $\Theta$. Then,
 \begin{theorem}
 Suppose that there are $|E_{\lf}| = d$ dependencies. When we use the latent variable model described in section \ref{sec:background} using $n_U$ unlabeled samples, 
+\ifsinglecolumn
+\begin{align}
+    R_U^{e} \le  & \varepsilon_{\max} \left(\frac{c_1 d}{m} + \frac{c_2}{\sqrt{n_U}} + \frac{c_3d }{m n_U}\right) + \frac{c_4 m}{n_U} + \B_I + o(1/n_U), 
+\end{align}
+\else
 \begin{align}
     R_U^{e} \le  & \varepsilon_{\max} \left(\frac{c_1 d}{m} + \frac{c_2}{\sqrt{n_U}} + \frac{c_3d }{m n_U}\right) \\
     + &\frac{c_4 m}{n_U} + \B_I + o(1/n_U), \nonumber
 \end{align}
+\fi
 where $c_1, c_2, c_3,$ and $c_4$ are constants depending on the intrinsic quality of the sources (Appendix). 
 \label{thm:unlabeled}
 \end{theorem}
@@ -159,7 +171,11 @@ Our results are in \autoref{fig:gen_err}. With no misspecification ($d=0$) the l
 
 \begin{figure}
     \centering
+    \ifsinglecolumn
+    \includegraphics[width=.75\textwidth]{eps_figures/biases.eps}
+    \else
     \includegraphics[width=.48\textwidth]{eps_figures/biases.eps}
+    \fi
     %
     \caption{Excess generalization error vs. $\log(n)$ with different estimators for synthetic data. Left: comparison of unlabeled data performance under the three discussed settings. Right: comparison of labeled data performance for well-specified and misspecified models. A dashed line repesenting an empirical ``$\B_I$'' suggests how inference bias is present in both data cases. % With no misspecification ($d=0$) the labeled and unlabeled estimators both converge to an asymptotic error of zero. Under misspecification ($d=5$), we see that learning from unlabeled data results in an additional $\B_{\mathrm{est}}$ standing bias due to misspecification, and median aggregation corrects for this bias so that error converges to $\B_I$.
     }

@@ -1,8 +1,8 @@
 \section{Background and Problem Setting} \label{sec:background}
 \vspace{-.5em}
-We start with background on latent variable models and introduce the model we analyze. We explain the stages---learning accuracies and inferring labels---for both the labeled and unlabeled cases, and conclude with model evaluation and key challenges.
+We start with background on latent variable models and introduce the model we analyze. We explain the stages---learning accuracies and inferring labels---for both the labeled and unlabeled cases, and conclude with model evaluation.
 
-\begin{figure*}
+\begin{figure*}[t]
     \centering
     \hspace*{-.5cm}\includegraphics[width=.7\textwidth]{figures/models.pdf}
     % \hspace*{-.6cm}\includegraphics[width=.525\textwidth]{figures/models.pdf}
@@ -47,7 +47,7 @@ The lack of an edge in $G$ between a pair of
 variables indicates independence conditioned on a separator set~\citep{Lauritzen}, so the true distribution can be modeled as
 \begin{align}
     \Pr(Y, \bm{\lf}) = \frac{1}{Z} \exp \Big(\theta_Y + \sum_{i = 1}^m \theta_i \lf_i Y + \sum_{(i, j) \in E_{\lf}} \theta_{ij} \lf_i \lf_j \Big),
-    \label{eq:true_pgm} \nonumber 
+     \nonumber 
     \vspace{-0.5em}
 \end{align}
 with cumulant function $Z$. For cleaner presentation, we assume $\Theta \ge 0$ (no sources that disagree with others or $Y$ on average) and $E_{\lf}$ is sparse enough such that $\text{deg}(\lf_i) \le 2$ for all $\lf_i$ (each source is conditionally dependent on at most one other source). This leads to model misspecification when edges are unknown.
@@ -55,11 +55,18 @@ with cumulant function $Z$. For cleaner presentation, we assume $\Theta \ge 0$ (
 %With this, we can explain the two steps involved in the process.
 
 \paragraph{Inference} The label is computed using a naive Bayes approach that assumes all sources are conditionally independent with $E_{\lf} = \emptyset$:
+\ifsinglecolumn
+\begin{align}
+    \widetilde{\Pr}(Y &= 1 | \lf = \lf(X)) = \frac{\prod_{i = 1}^m \widetilde{\Pr}(\lf_i = \lf_i(X) | Y = 1) \Pr(Y = 1)}{\hat{\Pr}(\lf = \lf(X))} 
+    \label{eq:inference}
+\end{align}
+\else
 \begin{align}
     \widetilde{\Pr}(Y &= 1 | \lf = \lf(X)) \nonumber \\
     &= \frac{\prod_{i = 1}^m \widetilde{\Pr}(\lf_i = \lf_i(X) | Y = 1) \Pr(Y = 1)}{\hat{\Pr}(\lf = \lf(X))} 
     \label{eq:inference}
 \end{align}
+\fi
 where the class balance $\Pr(Y = 1)$ is assumed to be known, $\hat{\Pr}$ is an empirical probability
 , and $\widetilde{\Pr}$ indicates an estimated probability resulting from the parameter estimation step described below. %The class balance $\Pr(Y = 1)$ is assumed to be known, so the only term to be estimated is $\widetilde{\Pr}(\lf_i = \lf_i(X) | Y = 1)$ for each $\lf_i$, which we describe how to do below. 
 %

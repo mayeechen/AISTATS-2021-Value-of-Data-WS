@@ -22,7 +22,7 @@ $V(n_U) = {n_U}/\alpha(n_U)$
 to be the \textit{data value ratio}. The intuitive idea here is to compare, for each amount of unlabeled data $n_U$, what factor less labeled data we would require to produce an equivalent error bound. We consider an approximation of the data value ratio $\widetilde{V}(n_U)$ based on our upper bounds for excess generalization error in \ref{subsec:scaling}. We examine the differences in $\widetilde{V}(n_U)$ for our three aforementioned settings:
 \begin{itemize}
     \item Well-specified setting: comparing excess risk when $d = 0$ and $\varepsilon_{\max} = 0$ reduces to examining $\frac{m}{2n_L}$ and $\frac{c_4 m}{n_U}$. Thus $\widetilde{V}(n_U) = 2c_4$ and our framework suggests that labeled data is only a constant factor more beneficial than unlabeled data.
-    \item Misspecified setting: $\widetilde{V}(n_U)$ will capture the tradeoff between $\frac{m}{2n_L}$ and $\B_{\mathrm{est}} + \frac{c_4 m }{n_U}$. We find that $\widetilde{V}(n_U) = 2 \varepsilon_{\max} \left(\frac{c_1 dn_U}{m} + \frac{c_2 \sqrt{n_U}}{m} + +\frac{c_3 d}{m^2} \right) + 2 c_4$. That is, the value of labeled data \textit{increases linearly in the amount of unlabeled data and misspecification} due to the standing bias in the generalization error for the unlabeled approach.  
+    \item Misspecified setting: $\widetilde{V}(n_U)$ will capture the tradeoff between $\frac{m}{2n_L}$ and $\B_{\mathrm{est}} + \frac{c_4 m }{n_U}$. We find that $\widetilde{V}(n_U) = 2 \varepsilon_{\max} \Big(\frac{c_1 dn_U}{m} +$ $\frac{c_2 \sqrt{n_U}}{m} + \frac{c_3 d}{m^2} \Big) + 2 c_4$. That is, the value of labeled data \textit{increases linearly in the amount of unlabeled data and misspecification} due to the standing bias in the generalization error for the unlabeled approach.  
     \item Corrected setting: under our conditions from Proposition \ref{prop:medians}, we examine the difference between $\frac{m}{2n_L}$ and $ c_\rho m \rho_{n_
     U}$, and thus $\widetilde{V}(n_U) = 2n_U c_{\rho} \rho_{n_U}$. Since $\rho_{n_U}$ converges to $0$, $\widetilde{V}(n_U)$ is sublinear in $n_U$, showing that the \textit{corrected model increases the relative value of unlabeled data.}
 \end{itemize}
@@ -34,7 +34,11 @@ We present the results in \autoref{fig:data_value_ratio}. In the well-specified 
 
 \begin{figure}
     \centering
+    \ifsinglecolumn
+    \includegraphics[width=.5\textwidth]{eps_figures/data_value_ratio_vs_n.eps}
+    \else
     \includegraphics[width=.3\textwidth]{eps_figures/data_value_ratio_vs_n.eps}
+    \fi
     %
     \caption{Data value ratio vs. $n$, using both the standard method-of-moments approach and the corrected approach, which aggregates results over triplets using medians. Note that $d=0$ represents the well-specified setting. %We see that in the well-specified case ($d=0$) the data value ratio is small and roughly constant across $n$. Under misspecification, the data value ratio grows with $d$ for both the baseline and corrected models, but grows faster for baseline models, as reflected by our theoretical model.
     }
@@ -115,7 +119,11 @@ The weights $\alpha$ are reported in the Appendix. The optimal weights for the w
 
 \begin{figure}
     \centering
+    \ifsinglecolumn
+    \includegraphics[width=.75\textwidth]{eps_figures/combined.eps}
+    \else
     \includegraphics[width=.48\textwidth]{eps_figures/combined.eps}
+    \fi
     %
     \caption{Excess generalization error for an optimally weighted combination of labeled and unlabeled estimators, and a combination weighted according to \cite{GreenStrawderman2001} across the well-specified (left), misspecified (center), and corrected (right) settings. The number of unlabeled points is fixed at $n_U=1000$. %The approach of \cite{GreenStrawderman2001} does not consistently outperform the unlabeled only approach in the well-specified case, where the unlabeled estimator is unbiased. However, it significantly outperforms either individual approach in the misspecified case and outperforms either individual approach in the corrected case. The combination weights are reported in the \todo{Appendix}. Broadly, the optimal weights for the well-specified and corrected settings are higher than the misspecified setting, and these weights decrease with $n_L$.
     }

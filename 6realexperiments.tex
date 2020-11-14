@@ -38,11 +38,35 @@ Hence, we anticipate that the corrected estimator reduces $\mathcal{B}_\text{est
 
 \begin{figure}
     \centering
+    \ifsinglecolumn
+    \begin{subfigure}{.75\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{eps_figures/real_biases_data_value_ratio.eps}
+    \end{subfigure}
+    \else
     \begin{subfigure}{.48\textwidth}
       \centering
       \includegraphics[width=\linewidth]{eps_figures/real_biases_data_value_ratio.eps}
     \end{subfigure}
+    \fi
    %
+   \ifsinglecolumn
+    \begin{subfigure}{.6\textwidth}
+      \small
+      \centering
+      {\renewcommand{\arraystretch}{1.2}
+      \begin{tabular}{lccr}
+      \hline
+      Model & Loss $(n=40\text{K})$ & F1 $(n=40\text{K})$ \\
+      \hline
+      Labeled & .570 & 71.79 \\
+      Unlabeled & .740 & 64.81 \\
+      Corrected & .686 & 68.12 \\
+      \hline
+      \end{tabular}
+      }
+    \end{subfigure}   
+   \else
     \begin{subfigure}{.48\textwidth}
       \small
       \centering
@@ -58,6 +82,7 @@ Hence, we anticipate that the corrected estimator reduces $\mathcal{B}_\text{est
       \end{tabular}
       }
     \end{subfigure}
+    \fi
     \caption{We measure test losses and F1-scores for labeled, unlabeled and corrected models on the IMDB dataset. Top Left: losses vs. $n$; each model appears to flatten out by $n=40,000$.  Bottom: losses and F1-scores at $n=40,000$, showing standing gaps in performance. Top Right: data value ratios for the two unlabeled models.}
     \label{fig:real_biases_data_value_ratio}
 \end{figure}
